@@ -5,6 +5,8 @@ import FinderSync
 struct ContentView: View {
     @State private var store = TemplateStore()
     @State private var selection: SidebarItem = .templates
+    @AppStorage("HasShownEnableExtensionGuide", store: .appGroup) private var hasShownEnableExtensionGuide = false
+    @State private var showEnableExtensionAlert = false
 
     var body: some View {
         NavigationSplitView {
@@ -20,6 +22,22 @@ struct ContentView: View {
             }
         }
         .frame(minWidth: 860, minHeight: 520)
+        .onAppear {
+            if !FIFinderSyncController.isExtensionEnabled && !hasShownEnableExtensionGuide {
+                showEnableExtensionAlert = true
+            }
+        }
+        .alert("启用 Finder 扩展", isPresented: $showEnableExtensionAlert) {
+            Button("打开设置") {
+                FIFinderSyncController.showExtensionManagementInterface()
+                hasShownEnableExtensionGuide = true
+            }
+            Button("稍后") {
+                hasShownEnableExtensionGuide = true
+            }
+        } message: {
+            Text("需要在系统设置里启用 Finder 扩展，右键菜单才能生效。")
+        }
     }
 }
 
@@ -118,27 +136,9 @@ private struct TemplateDetailView: View {
 private struct TemplateEditorView: View {
     @Binding var template: FileTemplate
     @Environment(\.scenePhase) private var scenePhase
-    @State private var extensionEnabled = false
-
-    private var enableIcon: String {
-        extensionEnabled ? "checkmark.circle.fill" : "checkmark.circle"
-    }
 
     var body: some View {
         Form {
-            Section("Finder 扩展") {
-                HStack {
-                    Text("启用扩展")
-                    Spacer()
-                    Button(action: openExtensionSettings) {
-                        Label("打开设置", systemImage: enableIcon)
-                    }
-                }
-                Text("必须在系统设置里启用 Finder 扩展，右键菜单才能生效。")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-            }
-
             Section("基本设置") {
                 Toggle("启用", isOn: $template.isEnabled)
                 TextField("显示名称", text: $template.displayName)
@@ -173,19 +173,6 @@ private struct TemplateEditorView: View {
             }
         }
         .formStyle(.grouped)
-        .onAppear(perform: updateEnableState)
-        .onChange(of: scenePhase) { _, newPhase in
-            guard newPhase == .active else { return }
-            updateEnableState()
-        }
-    }
-
-    private func updateEnableState() {
-        extensionEnabled = FIFinderSyncController.isExtensionEnabled
-    }
-
-    private func openExtensionSettings() {
-        FIFinderSyncController.showExtensionManagementInterface()
     }
 }
 
