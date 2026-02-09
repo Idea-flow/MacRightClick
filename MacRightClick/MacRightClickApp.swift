@@ -52,6 +52,15 @@ struct MacRightClickApp: App {
                 openApp(at: payload.target ?? "", bundleID: payload.appBundleID)
                 return
             }
+            if payload.action == "move-items" {
+                let target = payload.target ?? ""
+                let items = payload.targets
+                AppLogger.log(.info, "请求移动: \(items.joined(separator: ", ")) -> \(target)", category: "app")
+                Task {
+                    await moveItems(targetDirectory: target, itemPaths: items)
+                }
+                return
+            }
 
             AppLogger.log(.info, "收到消息: \(payload.action)", category: "app")
             guard payload.action == "create-file",
@@ -200,6 +209,93 @@ struct MacRightClickApp: App {
             try process.run()
         } catch {
             AppLogger.log(.error, "打开终端失败: \(path) \(error.localizedDescription)", category: "app")
+        }
+    }
+
+    private func moveItems(targetDirectory: String, itemPaths: [String]) async {
+        let trimmedTarget = targetDirectory.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedTarget.isEmpty else {
+            AppLogger.log(.warning, "移动失败：目标目录为空", category: "move")
+            return
+        }
+        guard itemPaths.isEmpty == false else {
+            AppLogger.log(.warning, "移动失败：未提供任何条目", category: "move")
+            return
+        }
+
+        let targetURL = URL(fileURLWithPath: trimmedTarget, isDirectory: true)
+        guard let targetScopeURL = await ensureAuthorizedScope(for: targetURL) else {
+            AppLogger.log(.warning, "移动失败：目标目录未授权 \(targetURL.path)", category: "move")
+            return
+        }
+
+        let fileManager = FileManager.default
+        var successCount = 0
+        var failureCount = 0
+
+        for path in itemPaths {
+            let trimmedPath = path.trimmingCharacters(in: .whitespacesAndNewlines)
+            if trimmedPath.isEmpty { continue }
+            let sourceURL = URL(fileURLWithPath: trimmedPath)
+            let sourceDir = sourceURL.deletingLastPathComponent()
+            guard let sourceScopeURL = await ensureAuthorizedScope(for: sourceDir) else {
+                AppLogger.log(.warning, "移动失败：源目录未授权 \(sourceDir.path)", category: "move")
+                failureCount += 1
+                continue
+            }
+
+            do {
+                let destinationURL = targetURL.appendingPathComponent(sourceURL.lastPathComponent)
+                try AuthorizedFolderStore.withSecurityScopedAccess(to: targetScopeURL) {
+                    try AuthorizedFolderStore.withSecurityScopedAccess(to: sourceScopeURL) {
+                        if fileManager.fileExists(atPath: destinationURL.path) {
+                            throw NSError(domain: "MoveItems", code: 1, userInfo: [NSLocalizedDescriptionKey: "目标已存在: \(destinationURL.lastPathComponent)"])
+                        }
+                        try fileManager.copyItem(at: sourceURL, to: destinationURL)
+                        try fileManager.removeItem(at: sourceURL)
+                    }
+                }
+                successCount += 1
+                AppLogger.log(.info, "移动成功: \(sourceURL.path) -> \(destinationURL.path)", category: "move")
+            } catch {
+                failureCount += 1
+                AppLogger.log(.error, "移动失败: \(sourceURL.path) \(error.localizedDescription)", category: "move")
+            }
+        }
+
+        AppLogger.log(.info, "移动完成：成功 \(successCount) 个，失败 \(failureCount) 个", category: "move")
+    }
+
+    private func ensureAuthorizedScope(for directoryURL: URL) async -> URL? {
+        if let scope = AuthorizedFolderStore.nearestAuthorizedURL(for: directoryURL) {
+            return scope
+        }
+
+        // 未授权时允许弹窗一次，引导用户选择目录并保存安全书签。
+        let selectedURL = await MainActor.run { () -> URL? in
+            let panel = NSOpenPanel()
+            panel.canChooseDirectories = true
+            panel.canChooseFiles = false
+            panel.allowsMultipleSelection = false
+            panel.prompt = "授权"
+            panel.message = "需要授权访问该目录以完成移动操作。请选择对应目录或其父目录。"
+            panel.directoryURL = directoryURL
+            return panel.runModal() == .OK ? panel.url : nil
+        }
+
+        guard let url = selectedURL else {
+            return nil
+        }
+
+        do {
+            let folder = try AuthorizedFolderStore.addFolder(url: url)
+            AppLogger.log(.info, "已新增授权目录: \(folder.path)", category: "authorization")
+            // 同步授权范围给 Finder 扩展
+            sendScopeUpdate()
+            return URL(fileURLWithPath: folder.path, isDirectory: true)
+        } catch {
+            AppLogger.log(.error, "授权失败: \(url.path) \(error.localizedDescription)", category: "authorization")
+            return nil
         }
     }
 }

@@ -7,6 +7,7 @@ final class FinderSync: FIFinderSync {
     private var templateIDsByTag: [Int: UUID] = [:]
     private var favoriteFolderByTag: [Int: FavoriteFolder] = [:]
     private var favoriteAppByTag: [Int: FavoriteApp] = [:]
+    private var moveTargetByTag: [Int: FavoriteFolder] = [:]
     private var menuConfig: MenuConfig = .default
     private var favoriteFolders: [FavoriteFolder] = []
     private var favoriteApps: [FavoriteApp] = []
@@ -76,6 +77,9 @@ final class FinderSync: FIFinderSync {
         case .contextualMenuForItems: // items
             if menuConfig.items.copyPathEnabled {
                 addCopyPathMenu(to: menu)
+            }
+            if !favoriteFolders.isEmpty {
+                addMoveToMenu(to: menu)
             }
         default:
             break
@@ -204,6 +208,32 @@ private extension FinderSync {
         parentItem.submenu = submenu
         menu.addItem(parentItem)
     }
+
+    func addMoveToMenu(to menu: NSMenu) {
+        let parentItem = NSMenuItem(title: "移动到", action: nil, keyEquivalent: "")
+        let submenu = NSMenu(title: "移动到")
+        submenu.autoenablesItems = false
+
+        moveTargetByTag.removeAll(keepingCapacity: true)
+        var tagCounter = 1
+        for folder in favoriteFolders {
+            guard !folder.path.isEmpty else {
+                continue
+            }
+            let item = NSMenuItem(title: folder.name, action: #selector(moveSelectedItems(_:)), keyEquivalent: "")
+            item.target = self
+            item.toolTip = folder.path
+            item.tag = tagCounter
+            moveTargetByTag[tagCounter] = folder
+            tagCounter += 1
+            submenu.addItem(item)
+        }
+
+        if submenu.items.isEmpty == false {
+            parentItem.submenu = submenu
+            menu.addItem(parentItem)
+        }
+    }
 }
 
 // MARK: - Copy Actions
@@ -265,6 +295,23 @@ private extension FinderSync {
             MessagePayload(action: "open-favorite-app", target: app.path, appBundleID: app.bundleIdentifier)
         )
         AppLogger.log(.info, "已请求打开 App: path=\(app.path), bundleID=\(app.bundleIdentifier)", category: "finder")
+    }
+
+    @objc func moveSelectedItems(_ sender: NSMenuItem) {
+        guard let targetFolder = moveTargetByTag[sender.tag] else {
+            AppLogger.log(.warning, "移动失败：未找到目标目录（menuTitle: \(sender.title), tag: \(sender.tag)）", category: "finder")
+            return
+        }
+        guard let urls = FIFinderSyncController.default().selectedItemURLs(),
+              urls.isEmpty == false else {
+            AppLogger.log(.warning, "移动失败：未选中任何条目", category: "finder")
+            return
+        }
+        let paths = urls.map { $0.path }
+        DistributedMessenger.shared.sendToApp(
+            MessagePayload(action: "move-items", target: targetFolder.path, targets: paths)
+        )
+        AppLogger.log(.info, "已请求移动: \(paths.joined(separator: ", ")) -> \(targetFolder.path)", category: "finder")
     }
 
     func writePathsToPasteboard(_ paths: [String]) {
