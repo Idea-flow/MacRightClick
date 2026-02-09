@@ -10,7 +10,7 @@ struct MacRightClickApp: App {
         setupExtensionCommunication()
         sendScopeUpdate()
         sendTemplatesUpdate()
-        sendMenuSettingsUpdate()
+        sendMenuConfigUpdate()
         DispatchQueue.main.async {
             DockVisibility.apply(showDockIcon: UserDefaults.appGroup.object(forKey: "ShowDockIcon") as? Bool ?? true)
         }
@@ -33,6 +33,11 @@ struct MacRightClickApp: App {
         DistributedMessenger.shared.onFromExtension { payload in
             if payload.action == "log" {
                 // LogStore already consumes log payloads; skip app-level warnings.
+                return
+            }
+
+            if payload.action == "open-terminal", let target = payload.target {
+                openTerminal(at: target)
                 return
             }
 
@@ -79,9 +84,20 @@ struct MacRightClickApp: App {
         DistributedMessenger.shared.sendToExtension(MessagePayload(action: "update-templates", templates: enabled))
     }
 
-    private func sendMenuSettingsUpdate() {
-        let enabled = UserDefaults.appGroup.object(forKey: "CopyPathsMenuEnabled") as? Bool ?? true
-        DistributedMessenger.shared.sendToExtension(MessagePayload(action: "update-menu-settings", copyPathsEnabled: enabled))
+    private func sendMenuConfigUpdate() {
+        let config = MenuConfigStore.load()
+        DistributedMessenger.shared.sendToExtension(MessagePayload(action: "update-menu-config", menuConfig: config))
+    }
+
+    private func openTerminal(at path: String) {
+        let process = Process()
+        process.launchPath = "/usr/bin/open"
+        process.arguments = ["-a", "Terminal", path]
+        do {
+            try process.run()
+        } catch {
+            AppLogger.log(.error, "打开终端失败: \(path) \(error.localizedDescription)", category: "app")
+        }
     }
 }
 

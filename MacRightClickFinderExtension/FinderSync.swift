@@ -5,7 +5,7 @@ import CoreGraphics
 final class FinderSync: FIFinderSync {
     private var templates: [FileTemplate] = []
     private var templateIDsByTag: [Int: UUID] = [:]
-    private var copyPathsEnabled = true
+    private var menuConfig: MenuConfig = .default
 
     override init() {
         super.init()
@@ -19,10 +19,10 @@ final class FinderSync: FIFinderSync {
             case "update-templates":
                 self.templates = payload.templates
                 AppLogger.log(.info, "已更新模板列表: \(payload.templates.count) 个", category: "finder")
-            case "update-menu-settings":
-                if let enabled = payload.copyPathsEnabled {
-                    self.copyPathsEnabled = enabled
-                    AppLogger.log(.info, "路径复制菜单: \(enabled ? "启用" : "禁用")", category: "finder")
+            case "update-menu-config":
+                if let config = payload.menuConfig {
+                    self.menuConfig = config
+                    AppLogger.log(.info, "菜单配置已更新", category: "finder")
                 }
             default:
                 break
@@ -43,9 +43,19 @@ final class FinderSync: FIFinderSync {
 
         switch menuKind {
         case .contextualMenuForContainer: // 空白区域
-            addNewFileMenu(to: menu)
+            if menuConfig.container.newFileEnabled {
+                addNewFileMenu(to: menu)
+            }
+            if menuConfig.container.copyPathEnabled {
+                addCopyCurrentDirectoryPath(to: menu)
+            }
+            if menuConfig.container.openTerminalEnabled {
+                addOpenTerminalMenu(to: menu)
+            }
         case .contextualMenuForItems: // items
-            addCopyPathMenu(to: menu)
+            if menuConfig.items.copyPathEnabled {
+                addCopyPathMenu(to: menu)
+            }
         default:
             break
         }
@@ -102,10 +112,23 @@ private extension FinderSync {
     }
 
     func addCopyPathMenu(to menu: NSMenu) {
-        guard copyPathsEnabled else { return }
         // Only show one menu item. Click decides whether to copy selected items
         // or the current directory path, so there is no extra submenu.
         let item = NSMenuItem(title: "复制当前路径", action: #selector(copyCurrentPath(_:)), keyEquivalent: "")
+        item.target = self
+        item.isEnabled = true
+        menu.addItem(item)
+    }
+
+    func addCopyCurrentDirectoryPath(to menu: NSMenu) {
+        let item = NSMenuItem(title: "复制当前目录路径", action: #selector(copyCurrentDirectoryPath(_:)), keyEquivalent: "")
+        item.target = self
+        item.isEnabled = true
+        menu.addItem(item)
+    }
+
+    func addOpenTerminalMenu(to menu: NSMenu) {
+        let item = NSMenuItem(title: "进入终端", action: #selector(openTerminal(_:)), keyEquivalent: "")
         item.target = self
         item.isEnabled = true
         menu.addItem(item)
@@ -130,6 +153,25 @@ private extension FinderSync {
         let path = url.path
         writePathsToPasteboard([path])
         AppLogger.log(.info, "已复制当前目录路径: \(path)", category: "finder")
+    }
+
+    @objc func copyCurrentDirectoryPath(_ sender: NSMenuItem) {
+        guard let url = FIFinderSyncController.default().targetedURL() else {
+            return
+        }
+        let path = url.path
+        writePathsToPasteboard([path])
+        AppLogger.log(.info, "已复制当前目录路径: \(path)", category: "finder")
+    }
+
+    @objc func openTerminal(_ sender: NSMenuItem) {
+        guard let url = FIFinderSyncController.default().targetedURL() else {
+            return
+        }
+        DistributedMessenger.shared.sendToApp(
+            MessagePayload(action: "open-terminal", target: url.path)
+        )
+        AppLogger.log(.info, "已请求打开终端: \(url.path)", category: "finder")
     }
 
     func writePathsToPasteboard(_ paths: [String]) {

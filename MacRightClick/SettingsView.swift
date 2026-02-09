@@ -4,7 +4,6 @@ import FinderSync
 struct SettingsView: View {
     @AppStorage("ShowDockIcon", store: .appGroup) private var showDockIcon = true
     @AppStorage("ShowMenuBar", store: .appGroup) private var showMenuBar = true
-    @AppStorage("CopyPathsMenuEnabled", store: .appGroup) private var copyPathsMenuEnabled = true
     @State private var extensionEnabled = false
     @Environment(\.scenePhase) private var scenePhase
 
@@ -40,14 +39,6 @@ struct SettingsView: View {
                     }
             }
 
-            Section("Finder 菜单") {
-                Toggle("启用路径复制菜单", isOn: $copyPathsMenuEnabled)
-                    .onChange(of: copyPathsMenuEnabled) { _, newValue in
-                        DistributedMessenger.shared.sendToExtension(
-                            MessagePayload(action: "update-menu-settings", copyPathsEnabled: newValue)
-                        )
-                    }
-            }
         }
         .formStyle(.grouped)
         .padding()

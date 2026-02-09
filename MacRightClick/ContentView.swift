@@ -16,6 +16,8 @@ struct ContentView: View {
             switch selection {
             case .templates:
                 TemplateWorkspaceView(store: store)
+            case .menuConfig:
+                MenuConfigView()
             case .logs:
                 LogView()
             case .authorizedFolders:
@@ -54,6 +56,7 @@ struct ContentView: View {
 
 private enum SidebarItem: String, Hashable, CaseIterable, Identifiable {
     case templates
+    case menuConfig
     case logs
     case authorizedFolders
     case settings
@@ -69,6 +72,8 @@ private struct SidebarView: View {
             Section("功能") {
                 Label("模板", systemImage: "doc.text")
                     .tag(SidebarItem.templates)
+                Label("菜单配置", systemImage: "slider.horizontal.3")
+                    .tag(SidebarItem.menuConfig)
                 Label("日志", systemImage: "text.justify")
                     .tag(SidebarItem.logs)
                 Label("授权目录", systemImage: "folder.badge.plus")
