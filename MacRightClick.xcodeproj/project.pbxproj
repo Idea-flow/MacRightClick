@@ -6,14 +6,29 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		78903CFDDAF663BBF802D620 /* MacRightClickFinderExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 0A19C171D937A72BFFB2F88C /* MacRightClickFinderExtension.appex */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		57A55DF92F39C4EF005A6194 /* MacRightClick.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MacRightClick.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0A19C171D937A72BFFB2F88C /* MacRightClickFinderExtension.appex */ = {isa = PBXFileReference; explicitFileType = wrapper.app-extension; includeInIndex = 0; path = MacRightClickFinderExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		57A55DFB2F39C4EF005A6194 /* MacRightClick */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = MacRightClick;
+			sourceTree = "<group>";
+		};
+		5D9749603F2E78A7C4C9194A /* MacRightClickFinderExtension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = MacRightClickFinderExtension;
+			sourceTree = "<group>";
+		};
+		777087C923183779214D547B /* Shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Shared;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -26,13 +41,36 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		1E08624FEDADA09CB2484BD6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		77A6C8DE1722486EF31669FF /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				78903CFDDAF663BBF802D620 /* MacRightClickFinderExtension.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXGroup section */
 		57A55DF02F39C4EF005A6194 = {
 			isa = PBXGroup;
 			children = (
 				57A55DFB2F39C4EF005A6194 /* MacRightClick */,
+				777087C923183779214D547B /* Shared */,
+				5D9749603F2E78A7C4C9194A /* MacRightClickFinderExtension */,
 				57A55DFA2F39C4EF005A6194 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,6 +79,7 @@
 			isa = PBXGroup;
 			children = (
 				57A55DF92F39C4EF005A6194 /* MacRightClick.app */,
+				0A19C171D937A72BFFB2F88C /* MacRightClickFinderExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -55,6 +94,7 @@
 				57A55DF52F39C4EF005A6194 /* Sources */,
 				57A55DF62F39C4EF005A6194 /* Frameworks */,
 				57A55DF72F39C4EF005A6194 /* Resources */,
+				77A6C8DE1722486EF31669FF /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
@@ -62,6 +102,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				57A55DFB2F39C4EF005A6194 /* MacRightClick */,
+				777087C923183779214D547B /* Shared */,
 			);
 			name = MacRightClick;
 			packageProductDependencies = (
@@ -69,6 +110,29 @@
 			productName = MacRightClick;
 			productReference = 57A55DF92F39C4EF005A6194 /* MacRightClick.app */;
 			productType = "com.apple.product-type.application";
+		};
+		041ACB51FFF99DBA3E35DFB2 /* MacRightClickFinderExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2815F4B0C06DC0CEEA338E6A /* Build configuration list for PBXNativeTarget "MacRightClickFinderExtension" */;
+			buildPhases = (
+				1432A26FE21A170CF62A73B8 /* Sources */,
+				1E08624FEDADA09CB2484BD6 /* Frameworks */,
+				1F5D42EB4E2CC52346D826E2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				5D9749603F2E78A7C4C9194A /* MacRightClickFinderExtension */,
+				777087C923183779214D547B /* Shared */,
+			);
+			name = MacRightClickFinderExtension;
+			packageProductDependencies = (
+			);
+			productName = MacRightClickFinderExtension;
+			productReference = 0A19C171D937A72BFFB2F88C /* MacRightClickFinderExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -81,6 +145,9 @@
 				LastUpgradeCheck = 2620;
 				TargetAttributes = {
 					57A55DF82F39C4EF005A6194 = {
+						CreatedOnToolsVersion = 26.2;
+					};
+					041ACB51FFF99DBA3E35DFB2 = {
 						CreatedOnToolsVersion = 26.2;
 					};
 				};
@@ -100,6 +167,7 @@
 			projectRoot = "";
 			targets = (
 				57A55DF82F39C4EF005A6194 /* MacRightClick */,
+				041ACB51FFF99DBA3E35DFB2 /* MacRightClickFinderExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -112,10 +180,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		1F5D42EB4E2CC52346D826E2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		57A55DF52F39C4EF005A6194 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1432A26FE21A170CF62A73B8 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -250,6 +332,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = MacRightClick/MacRightClick.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -282,6 +365,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = MacRightClick/MacRightClick.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -309,6 +393,58 @@
 			};
 			name = Release;
 		};
+		343D896751901579FE4B6A28 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = MacRightClickFinderExtension/MacRightClickFinderExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2VU69Q9CGK;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MacRightClickFinderExtension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.biliww.MacRightClick.FinderExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		42CA4F3D9EA798B2CE4741BD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = MacRightClickFinderExtension/MacRightClickFinderExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2VU69Q9CGK;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MacRightClickFinderExtension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.biliww.MacRightClick.FinderExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -326,6 +462,15 @@
 			buildConfigurations = (
 				57A55E072F39C4F0005A6194 /* Debug */,
 				57A55E082F39C4F0005A6194 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2815F4B0C06DC0CEEA338E6A /* Build configuration list for PBXNativeTarget "MacRightClickFinderExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				343D896751901579FE4B6A28 /* Debug */,
+				42CA4F3D9EA798B2CE4741BD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
