@@ -74,3 +74,16 @@ App 收到通知后写入日志文件
 finder 不写任何文件,应该就不会弹窗了, 通过通信的方式 来解决,
 
 
+已修复权限配置问题：主 App 缺少 com.apple.security.files.bookmarks.app-scope，导致安全书签解析后仍无法写入目录。
+
+已更新：
+
+MacRightClick.entitlements
+请重新 build & 运行，再试创建文件。
+
+如果仍报权限错误，我会再加一条日志输出：
+
+当前授权目录列表
+startAccessingSecurityScopedResource 是否成功
+但先跑一次看看是否已解决。
+

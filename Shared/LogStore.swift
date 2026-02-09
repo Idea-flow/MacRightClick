@@ -96,14 +96,14 @@ final class LogStore {
     }
 
     func append(_ entry: LogEntry) {
-        queue.sync {
+        queue.async { [self] in
             do {
-                try ensureDirectoryExists()
-                if !FileManager.default.fileExists(atPath: fileURL.path) {
-                    FileManager.default.createFile(atPath: fileURL.path, contents: nil, attributes: nil)
+                try self.ensureDirectoryExists()
+                if !FileManager.default.fileExists(atPath: self.fileURL.path) {
+                    FileManager.default.createFile(atPath: self.fileURL.path, contents: nil, attributes: nil)
                 }
 
-                let handle = try FileHandle(forWritingTo: fileURL)
+                let handle = try FileHandle(forWritingTo: self.fileURL)
                 defer { try? handle.close() }
                 try handle.seekToEnd()
 
@@ -117,8 +117,10 @@ final class LogStore {
             } catch {
                 // Avoid recursive logging on failure.
             }
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: Self.didAppendNotification, object: nil)
+            }
         }
-        NotificationCenter.default.post(name: Self.didAppendNotification, object: nil)
     }
 
     func fetchAll(limit: Int? = 500) -> [LogEntry] {

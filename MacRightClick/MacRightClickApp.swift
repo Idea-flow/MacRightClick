@@ -43,13 +43,15 @@ struct MacRightClickApp: App {
                 return
             }
 
-            do {
-                let fileURL = try AuthorizedFolderStore.withSecurityScopedAccess(to: directoryURL) {
-                    try FileCreator.createFile(template: template, in: directoryURL)
+            Task.detached(priority: .userInitiated) {
+                do {
+                    let fileURL = try AuthorizedFolderStore.withSecurityScopedAccess(to: directoryURL) {
+                        try FileCreator.createFile(template: template, in: directoryURL)
+                    }
+                    AppLogger.log(.info, "创建文件成功: \(fileURL.path)", category: "app")
+                } catch {
+                    AppLogger.log(.error, "创建文件失败: \(directoryURL.path) \(error.localizedDescription)", category: "app")
                 }
-                AppLogger.log(.info, "创建文件成功: \(fileURL.path)", category: "app")
-            } catch {
-                AppLogger.log(.error, "创建文件失败: \(directoryURL.path) \(error.localizedDescription)", category: "app")
             }
         }
     }
