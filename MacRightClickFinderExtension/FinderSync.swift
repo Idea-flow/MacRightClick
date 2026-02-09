@@ -5,7 +5,7 @@ import CoreGraphics
 final class FinderSync: FIFinderSync {
     override init() {
         super.init()
-        FIFinderSyncController.default().directoryURLs = [FileManager.default.homeDirectoryForCurrentUser]
+        FIFinderSyncController.default().directoryURLs = [URL(fileURLWithPath: "/Users/")]
     }
 
     override func menu(for menuKind: FIMenuKind) -> NSMenu? {
