@@ -10,6 +10,7 @@ struct MacRightClickApp: App {
         setupExtensionCommunication()
         sendScopeUpdate()
         sendTemplatesUpdate()
+        sendMenuSettingsUpdate()
         DispatchQueue.main.async {
             DockVisibility.apply(showDockIcon: UserDefaults.appGroup.object(forKey: "ShowDockIcon") as? Bool ?? true)
         }
@@ -76,6 +77,11 @@ struct MacRightClickApp: App {
     private func sendTemplatesUpdate() {
         let enabled = TemplateStore.enabledTemplates()
         DistributedMessenger.shared.sendToExtension(MessagePayload(action: "update-templates", templates: enabled))
+    }
+
+    private func sendMenuSettingsUpdate() {
+        let enabled = UserDefaults.appGroup.object(forKey: "CopyPathsMenuEnabled") as? Bool ?? true
+        DistributedMessenger.shared.sendToExtension(MessagePayload(action: "update-menu-settings", copyPathsEnabled: enabled))
     }
 }
 

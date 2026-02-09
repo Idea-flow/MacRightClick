@@ -5,6 +5,7 @@ import CoreGraphics
 final class FinderSync: FIFinderSync {
     private var templates: [FileTemplate] = []
     private var templateIDsByTag: [Int: UUID] = [:]
+    private var copyPathsEnabled = true
 
     override init() {
         super.init()
@@ -18,6 +19,11 @@ final class FinderSync: FIFinderSync {
             case "update-templates":
                 self.templates = payload.templates
                 AppLogger.log(.info, "已更新模板列表: \(payload.templates.count) 个", category: "finder")
+            case "update-menu-settings":
+                if let enabled = payload.copyPathsEnabled {
+                    self.copyPathsEnabled = enabled
+                    AppLogger.log(.info, "路径复制菜单: \(enabled ? "启用" : "禁用")", category: "finder")
+                }
             default:
                 break
             }
@@ -30,32 +36,19 @@ final class FinderSync: FIFinderSync {
             return nil
         }
 
-        guard !templates.isEmpty else {
-            AppLogger.log(.warning, "未启用任何模板，菜单不显示", category: "finder")
-            return nil
-        }
         AppLogger.log(.info, "右键菜单打开", category: "finder")
 
-        let menu = NSMenu(title: "新建文件")
+        let menu = NSMenu(title: "快捷操作")
         menu.autoenablesItems = false
-        let parentItem = NSMenuItem(title: "新建文件", action: nil, keyEquivalent: "")
-        let submenu = NSMenu(title: "新建文件")
-        submenu.autoenablesItems = false
 
-        templateIDsByTag.removeAll(keepingCapacity: true)
-        var tagCounter = 1
-        for template in templates {
-            let item = NSMenuItem(title: template.displayName, action: #selector(FinderSync.createFile(_:)), keyEquivalent: "")
-            item.target = self
-            item.isEnabled = true
-            item.tag = tagCounter
-            templateIDsByTag[tagCounter] = template.id
-            tagCounter += 1
-            submenu.addItem(item)
+        switch menuKind {
+        case .contextualMenuForContainer: // 空白区域
+            addNewFileMenu(to: menu)
+        case .contextualMenuForItems: // items
+            addCopyPathMenu(to: menu)
+        default:
+            break
         }
-
-        parentItem.submenu = submenu
-        menu.addItem(parentItem)
         return menu
     }
 
@@ -78,5 +71,71 @@ final class FinderSync: FIFinderSync {
         AppLogger.log(.info, "已点击菜单: \(sender.title)", category: "finder")
         AppLogger.log(.info, "发送创建请求: \(directoryURL.path) templateID: \(templateID)", category: "finder")
         AppLogger.log(.info, "已请求创建文件: \(directoryURL.path)", category: "finder")
+    }
+}
+
+// MARK: - Menu Builders
+private extension FinderSync {
+    func addNewFileMenu(to menu: NSMenu) {
+        guard !templates.isEmpty else {
+            AppLogger.log(.warning, "未启用任何模板，菜单不显示", category: "finder")
+            return
+        }
+        let parentItem = NSMenuItem(title: "新建文件", action: nil, keyEquivalent: "")
+        let submenu = NSMenu(title: "新建文件")
+        submenu.autoenablesItems = false
+
+        templateIDsByTag.removeAll(keepingCapacity: true)
+        var tagCounter = 1
+        for template in templates {
+            let item = NSMenuItem(title: template.displayName, action: #selector(FinderSync.createFile(_:)), keyEquivalent: "")
+            item.target = self
+            item.isEnabled = true
+            item.tag = tagCounter
+            templateIDsByTag[tagCounter] = template.id
+            tagCounter += 1
+            submenu.addItem(item)
+        }
+
+        parentItem.submenu = submenu
+        menu.addItem(parentItem)
+    }
+
+    func addCopyPathMenu(to menu: NSMenu) {
+        guard copyPathsEnabled else { return }
+        // Only show one menu item. Click decides whether to copy selected items
+        // or the current directory path, so there is no extra submenu.
+        let item = NSMenuItem(title: "复制当前路径", action: #selector(copyCurrentPath(_:)), keyEquivalent: "")
+        item.target = self
+        item.isEnabled = true
+        menu.addItem(item)
+    }
+}
+
+// MARK: - Copy Actions
+private extension FinderSync {
+    @objc func copyCurrentPath(_ sender: NSMenuItem) {
+        // If there are selected items, copy their paths; otherwise copy the current directory.
+        if let urls = FIFinderSyncController.default().selectedItemURLs(),
+           !urls.isEmpty {
+            let paths = urls.map { $0.path }
+            writePathsToPasteboard(paths)
+            AppLogger.log(.info, "已复制所选项路径: \(paths.joined(separator: ", "))", category: "finder")
+            return
+        }
+
+        guard let url = FIFinderSyncController.default().targetedURL() else {
+            return
+        }
+        let path = url.path
+        writePathsToPasteboard([path])
+        AppLogger.log(.info, "已复制当前目录路径: \(path)", category: "finder")
+    }
+
+    func writePathsToPasteboard(_ paths: [String]) {
+        // Explicitly clear then set to avoid mixing with previous clipboard content.
+        let pasteboard = NSPasteboard.general
+        pasteboard.clearContents()
+        pasteboard.setString(paths.joined(separator: "\n"), forType: .string)
     }
 }

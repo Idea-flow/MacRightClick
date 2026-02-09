@@ -7,6 +7,7 @@ struct MessagePayload: Codable {
     var template: FileTemplate?
     var templateID: UUID?
     var templates: [FileTemplate]
+    var copyPathsEnabled: Bool?
     var level: String?
     var category: String?
     var message: String?
@@ -18,6 +19,7 @@ struct MessagePayload: Codable {
          template: FileTemplate? = nil,
          templateID: UUID? = nil,
          templates: [FileTemplate] = [],
+         copyPathsEnabled: Bool? = nil,
          level: String? = nil,
          category: String? = nil,
          message: String? = nil,
@@ -28,6 +30,7 @@ struct MessagePayload: Codable {
         self.template = template
         self.templateID = templateID
         self.templates = templates
+        self.copyPathsEnabled = copyPathsEnabled
         self.level = level
         self.category = category
         self.message = message

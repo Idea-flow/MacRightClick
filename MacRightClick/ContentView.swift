@@ -7,6 +7,7 @@ struct ContentView: View {
     @State private var selection: SidebarItem = .templates
     @AppStorage("HasShownEnableExtensionGuide", store: .appGroup) private var hasShownEnableExtensionGuide = false
     @State private var showEnableExtensionAlert = false
+    @AppStorage("ShowDockIcon", store: .appGroup) private var showDockIcon = true
 
     var body: some View {
         NavigationSplitView {
@@ -24,6 +25,14 @@ struct ContentView: View {
             }
         }
         .frame(minWidth: 860, minHeight: 520)
+        .onAppear {
+            DockVisibility.apply(showDockIcon: true)
+        }
+        .onDisappear {
+            if !showDockIcon {
+                DockVisibility.apply(showDockIcon: false)
+            }
+        }
         .onAppear {
             if !FIFinderSyncController.isExtensionEnabled && !hasShownEnableExtensionGuide {
                 showEnableExtensionAlert = true
