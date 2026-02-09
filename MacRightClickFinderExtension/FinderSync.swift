@@ -6,6 +6,8 @@ final class FinderSync: FIFinderSync {
     override init() {
         super.init()
         FIFinderSyncController.default().directoryURLs = [URL(fileURLWithPath: "/Users/")]
+        AppLogger.log(.info, "Finder 扩展启动", category: "finder")
+//        AppLogger.log(.info, "directoryURLs: \(scopeURLs.map { $0.path }.joined(separator: ", "))", category: "finder")
     }
 
     override func menu(for menuKind: FIMenuKind) -> NSMenu? {
@@ -15,8 +17,10 @@ final class FinderSync: FIFinderSync {
 
         let templates = TemplateStore.enabledTemplates()
         guard !templates.isEmpty else {
+            AppLogger.log(.warning, "未启用任何模板，菜单不显示", category: "finder")
             return nil
         }
+        AppLogger.log(.info, "右键菜单打开", category: "finder")
 
         let menu = NSMenu(title: "新建文件")
         let parentItem = NSMenuItem(title: "新建文件", action: nil, keyEquivalent: "")
@@ -52,7 +56,9 @@ final class FinderSync: FIFinderSync {
 
         do {
             try writeFile(for: template, to: fileURL)
+            AppLogger.log(.info, "创建文件成功: \(fileURL.path)", category: "finder")
         } catch {
+            AppLogger.log(.error, "创建文件失败: \(fileURL.path)", category: "finder")
             NSSound.beep()
         }
     }

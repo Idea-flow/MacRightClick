@@ -4,14 +4,58 @@ import FinderSync
 
 struct ContentView: View {
     @State private var store = TemplateStore()
+    @State private var selection: SidebarItem = .templates
 
     var body: some View {
         NavigationSplitView {
-            TemplateListView(store: store)
+            SidebarView(selection: $selection)
         } detail: {
-            TemplateDetailView(store: store)
+            switch selection {
+            case .templates:
+                TemplateWorkspaceView(store: store)
+            case .logs:
+                LogView()
+            }
         }
-        .frame(minWidth: 760, minHeight: 480)
+        .frame(minWidth: 860, minHeight: 520)
+    }
+}
+
+private enum SidebarItem: String, Hashable, CaseIterable, Identifiable {
+    case templates
+    case logs
+
+    var id: String { rawValue }
+}
+
+private struct SidebarView: View {
+    @Binding var selection: SidebarItem
+
+    var body: some View {
+        List(selection: $selection) {
+            Section("功能") {
+                Label("模板", systemImage: "doc.text")
+                    .tag(SidebarItem.templates)
+                Label("日志", systemImage: "text.justify")
+                    .tag(SidebarItem.logs)
+            }
+        }
+        .listStyle(.sidebar)
+        .navigationTitle("右键助手")
+    }
+}
+
+private struct TemplateWorkspaceView: View {
+    @Bindable var store: TemplateStore
+
+    var body: some View {
+        HStack(spacing: 0) {
+            TemplateListView(store: store)
+                .frame(minWidth: 220, idealWidth: 240, maxWidth: 280)
+            Divider()
+            TemplateDetailView(store: store)
+                .frame(minWidth: 320, maxWidth: .infinity)
+        }
     }
 }
 
@@ -26,8 +70,6 @@ private struct TemplateListView: View {
                 }
             }
         }
-        .navigationTitle("右键助手")
-        .navigationSplitViewColumnWidth(min: 220, ideal: 240, max: 280)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button("恢复默认", action: store.restoreDefaults)

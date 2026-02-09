@@ -7,11 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1A9975288E46EBBBF1C57CE1 /* LogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05AE769DD42B7C417C5EB09F /* LogStore.swift */; };
 		23CE575E654F9D40883E792F /* FinderSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7206CC57FC1E452ECFEEB9 /* FinderSync.swift */; };
+		27A4B4208B5A7CA0B2413936 /* LogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05AE769DD42B7C417C5EB09F /* LogStore.swift */; };
+		31F1DC5D36A3D5E2BCCE653A /* FinderSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7206CC57FC1E452ECFEEB9 /* FinderSync.swift */; };
 		59C9205E9BB6268E019017CE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 233F8EC4446307D237AB97DA /* ContentView.swift */; };
+		5E128C4A12B7B52A3ED90E56 /* FinderSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7206CC57FC1E452ECFEEB9 /* FinderSync.swift */; };
 		73FE1512784120F73E1E0C2E /* FinderSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7206CC57FC1E452ECFEEB9 /* FinderSync.swift */; };
 		78903CFDDAF663BBF802D620 /* MacRightClickFinderExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 0A19C171D937A72BFFB2F88C /* MacRightClickFinderExtension.appex */; };
+		823CE5D9071164E3E6766EB0 /* FinderSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7206CC57FC1E452ECFEEB9 /* FinderSync.swift */; };
+		8E9FD9F8F27093A8E906C329 /* MacRightClickApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EF8BA438EC9CA805A15C262 /* MacRightClickApp.swift */; };
 		91B595EAB94DCB413816FA5B /* TemplateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43C3DFCBD13191D21BD1FCB1 /* TemplateStore.swift */; };
+		AC82F6B84D057C99EFF3A8F6 /* FinderSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7206CC57FC1E452ECFEEB9 /* FinderSync.swift */; };
+		C977CD5318DB3497DE899A56 /* LogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A997B5EA222547C1A612C9E6 /* LogView.swift */; };
 		CFE2F2179561313BC7C22E34 /* FinderSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7206CC57FC1E452ECFEEB9 /* FinderSync.swift */; };
 /* End PBXBuildFile section */
 
@@ -30,12 +38,16 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		05AE769DD42B7C417C5EB09F /* LogStore.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; name = LogStore.swift; path = Shared/LogStore.swift; sourceTree = SOURCE_ROOT; };
+		085A16C60E0A95C11D5601EE /* record1.md */ = {isa = PBXFileReference; explicitFileType = net.daringfireball.markdown; lastKnownFileType = net.daringfireball.markdown; name = record1.md; path = AI/record/record1.md; sourceTree = SOURCE_ROOT; };
 		0A19C171D937A72BFFB2F88C /* MacRightClickFinderExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MacRightClickFinderExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		233F8EC4446307D237AB97DA /* ContentView.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; lastKnownFileType = sourcecode.swift; name = ContentView.swift; path = MacRightClick/ContentView.swift; sourceTree = SOURCE_ROOT; };
-		43C3DFCBD13191D21BD1FCB1 /* TemplateStore.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; lastKnownFileType = sourcecode.swift; name = TemplateStore.swift; path = Shared/TemplateStore.swift; sourceTree = SOURCE_ROOT; };
+		233F8EC4446307D237AB97DA /* ContentView.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; name = ContentView.swift; path = MacRightClick/ContentView.swift; sourceTree = SOURCE_ROOT; };
+		43C3DFCBD13191D21BD1FCB1 /* TemplateStore.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; name = TemplateStore.swift; path = Shared/TemplateStore.swift; sourceTree = SOURCE_ROOT; };
 		57A55DF92F39C4EF005A6194 /* MacRightClick.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MacRightClick.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		AC7206CC57FC1E452ECFEEB9 /* FinderSync.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; lastKnownFileType = sourcecode.swift; name = FinderSync.swift; path = MacRightClickFinderExtension/FinderSync.swift; sourceTree = SOURCE_ROOT; };
-		DB494B770E08E47A7828BC04 /* workspace.xml */ = {isa = PBXFileReference; explicitFileType = text.xml; lastKnownFileType = text.xml; name = workspace.xml; path = .idea/workspace.xml; sourceTree = SOURCE_ROOT; };
+		7EF8BA438EC9CA805A15C262 /* MacRightClickApp.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; lastKnownFileType = sourcecode.swift; name = MacRightClickApp.swift; path = MacRightClick/MacRightClickApp.swift; sourceTree = SOURCE_ROOT; };
+		A997B5EA222547C1A612C9E6 /* LogView.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; lastKnownFileType = sourcecode.swift; name = LogView.swift; path = MacRightClick/LogView.swift; sourceTree = SOURCE_ROOT; };
+		AC7206CC57FC1E452ECFEEB9 /* FinderSync.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; name = FinderSync.swift; path = MacRightClickFinderExtension/FinderSync.swift; sourceTree = SOURCE_ROOT; };
+		DB494B770E08E47A7828BC04 /* workspace.xml */ = {isa = PBXFileReference; explicitFileType = text.xml; name = workspace.xml; path = .idea/workspace.xml; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -85,6 +97,10 @@
 				AC7206CC57FC1E452ECFEEB9 /* FinderSync.swift */,
 				43C3DFCBD13191D21BD1FCB1 /* TemplateStore.swift */,
 				DB494B770E08E47A7828BC04 /* workspace.xml */,
+				05AE769DD42B7C417C5EB09F /* LogStore.swift */,
+				A997B5EA222547C1A612C9E6 /* LogView.swift */,
+				7EF8BA438EC9CA805A15C262 /* MacRightClickApp.swift */,
+				085A16C60E0A95C11D5601EE /* record1.md */,
 			);
 			sourceTree = "<group>";
 		};
@@ -209,6 +225,9 @@
 			files = (
 				73FE1512784120F73E1E0C2E /* FinderSync.swift in Sources */,
 				23CE575E654F9D40883E792F /* FinderSync.swift in Sources */,
+				823CE5D9071164E3E6766EB0 /* FinderSync.swift in Sources */,
+				5E128C4A12B7B52A3ED90E56 /* FinderSync.swift in Sources */,
+				AC82F6B84D057C99EFF3A8F6 /* FinderSync.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -219,6 +238,11 @@
 				59C9205E9BB6268E019017CE /* ContentView.swift in Sources */,
 				91B595EAB94DCB413816FA5B /* TemplateStore.swift in Sources */,
 				CFE2F2179561313BC7C22E34 /* FinderSync.swift in Sources */,
+				27A4B4208B5A7CA0B2413936 /* LogStore.swift in Sources */,
+				C977CD5318DB3497DE899A56 /* LogView.swift in Sources */,
+				8E9FD9F8F27093A8E906C329 /* MacRightClickApp.swift in Sources */,
+				31F1DC5D36A3D5E2BCCE653A /* FinderSync.swift in Sources */,
+				1A9975288E46EBBBF1C57CE1 /* LogStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
