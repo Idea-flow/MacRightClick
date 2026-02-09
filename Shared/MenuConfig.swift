@@ -9,18 +9,27 @@ struct MenuConfig: Codable, Equatable {
         var newFileEnabled: Bool
         var copyPathEnabled: Bool
         var openTerminalEnabled: Bool
+        var favoriteFoldersEnabled: Bool
+        var favoriteAppsEnabled: Bool
     }
 
     struct Items: Codable, Equatable {
         var copyPathEnabled: Bool
+        var moveToEnabled: Bool
     }
 
     var container: Container
     var items: Items
 
     static let `default` = MenuConfig(
-        container: .init(newFileEnabled: true, copyPathEnabled: true, openTerminalEnabled: true),
-        items: .init(copyPathEnabled: true)
+        container: .init(
+            newFileEnabled: true,
+            copyPathEnabled: true,
+            openTerminalEnabled: true,
+            favoriteFoldersEnabled: true,
+            favoriteAppsEnabled: true
+        ),
+        items: .init(copyPathEnabled: true, moveToEnabled: true)
     )
 }
 

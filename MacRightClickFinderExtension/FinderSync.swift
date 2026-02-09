@@ -68,17 +68,17 @@ final class FinderSync: FIFinderSync {
             if menuConfig.container.openTerminalEnabled {
                 addOpenTerminalMenu(to: menu)
             }
-            if !favoriteFolders.isEmpty {
+            if menuConfig.container.favoriteFoldersEnabled, !favoriteFolders.isEmpty {
                 addFavoriteFoldersMenu(to: menu)
             }
-            if !favoriteApps.isEmpty {
+            if menuConfig.container.favoriteAppsEnabled, !favoriteApps.isEmpty {
                 addFavoriteAppsMenu(to: menu)
             }
         case .contextualMenuForItems: // items
             if menuConfig.items.copyPathEnabled {
                 addCopyPathMenu(to: menu)
             }
-            if !favoriteFolders.isEmpty {
+            if menuConfig.items.moveToEnabled, !favoriteFolders.isEmpty {
                 addMoveToMenu(to: menu)
             }
         default:

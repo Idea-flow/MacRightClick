@@ -9,10 +9,13 @@ struct MenuConfigView: View {
                 Toggle("新建文件", isOn: binding(\.container.newFileEnabled))
                 Toggle("复制当前目录路径", isOn: binding(\.container.copyPathEnabled))
                 Toggle("进入终端", isOn: binding(\.container.openTerminalEnabled))
+                Toggle("常用目录", isOn: binding(\.container.favoriteFoldersEnabled))
+                Toggle("常用 App", isOn: binding(\.container.favoriteAppsEnabled))
             }
 
             Section("选中项（Items）") {
                 Toggle("复制当前路径", isOn: binding(\.items.copyPathEnabled))
+                Toggle("移动到", isOn: binding(\.items.moveToEnabled))
             }
         }
         .formStyle(.grouped)
