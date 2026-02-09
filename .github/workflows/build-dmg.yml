@@ -1,0 +1,69 @@
+name: Build DMG
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-dmg:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read Version
+        id: version
+        run: |
+          set -euo pipefail
+          INFO_PLIST="MacRightClick/Info.plist"
+          VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$INFO_PLIST")
+          BUILD=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$INFO_PLIST")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "build=$BUILD" >> "$GITHUB_OUTPUT"
+
+      - name: Build Archive
+        run: |
+          set -euo pipefail
+          xcodebuild \
+            -project MacRightClick.xcodeproj \
+            -scheme MacRightClick \
+            -configuration Release \
+            -archivePath build/MacRightClick.xcarchive \
+            CODE_SIGNING_ALLOWED=NO \
+            clean archive
+
+      - name: Create DMG
+        run: |
+          set -euo pipefail
+          APP_PATH="build/MacRightClick.xcarchive/Products/Applications/MacRightClick.app"
+          STAGING="build/dmg"
+          DMG_PATH="build/MacRightClick-${{ steps.version.outputs.version }}-${{ steps.version.outputs.build }}.dmg"
+
+          rm -rf "$STAGING"
+          mkdir -p "$STAGING"
+          cp -R "$APP_PATH" "$STAGING/"
+
+          hdiutil create -volname "MacRightClick" -srcfolder "$STAGING" -ov -format UDZO "$DMG_PATH"
+
+      - name: Create Release
+        id: release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}-${{ steps.version.outputs.build }}
+          name: MacRightClick v${{ steps.version.outputs.version }} (build ${{ steps.version.outputs.build }})
+          files: build/MacRightClick-${{ steps.version.outputs.version }}-${{ steps.version.outputs.build }}.dmg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Print Release Info
+        run: |
+          echo "Release Name: MacRightClick v${{ steps.version.outputs.version }} (build ${{ steps.version.outputs.build }})"
+          echo "Release Tag: v${{ steps.version.outputs.version }}-${{ steps.version.outputs.build }}"
+          echo "Release URL: ${{ steps.release.outputs.url }}"
+
+      - name: Upload DMG Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MacRightClick-dmg
+          path: build/MacRightClick-${{ steps.version.outputs.version }}-${{ steps.version.outputs.build }}.dmg

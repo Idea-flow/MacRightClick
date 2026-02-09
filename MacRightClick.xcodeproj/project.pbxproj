@@ -67,6 +67,7 @@
 		AC7206CC57FC1E452ECFEEB9 /* FinderSync.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; name = FinderSync.swift; path = MacRightClickFinderExtension/FinderSync.swift; sourceTree = SOURCE_ROOT; };
 		B03CF2B468F1B6F5E5BDF489 /* AuthorizedFoldersView.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; name = AuthorizedFoldersView.swift; path = MacRightClick/AuthorizedFoldersView.swift; sourceTree = SOURCE_ROOT; };
 		B719FF09BB9BFFFCFBE5789E /* FileCreator.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; name = FileCreator.swift; path = Shared/FileCreator.swift; sourceTree = SOURCE_ROOT; };
+		B78CD95FB5D29DE2731166A9 /* build-dmg.yml */ = {isa = PBXFileReference; explicitFileType = text.yaml; lastKnownFileType = text.yaml; name = "build-dmg.yml"; path = ".github/workflows/build-dmg.yml"; sourceTree = SOURCE_ROOT; };
 		BCE6CDF6CC909BD740C84369 /* DockVisibility.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; name = DockVisibility.swift; path = MacRightClick/DockVisibility.swift; sourceTree = SOURCE_ROOT; };
 		BF05810270C645D614E89A20 /* 不弹窗.md */ = {isa = PBXFileReference; explicitFileType = net.daringfireball.markdown; name = "不弹窗.md"; path = "AI/record/不弹窗.md"; sourceTree = SOURCE_ROOT; };
 		C1BA2C0F842113110D29DC7A /* FavoriteFolderStore.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; name = FavoriteFolderStore.swift; path = Shared/FavoriteFolderStore.swift; sourceTree = SOURCE_ROOT; };
@@ -147,6 +148,7 @@
 				CA3409FBDEF68A438AAAC286 /* FavoriteAppStore.swift */,
 				17D6917E3A2E18DFBBBA6699 /* FavoriteFoldersView.swift */,
 				7897C5434249777AA29E313D /* FavoriteAppsView.swift */,
+				B78CD95FB5D29DE2731166A9 /* build-dmg.yml */,
 			);
 			sourceTree = "<group>";
 		};
