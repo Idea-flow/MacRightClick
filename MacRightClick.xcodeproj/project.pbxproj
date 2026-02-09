@@ -18,6 +18,7 @@
 		7CD133925C156C4E8F81E0FB /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98D8C90AA683A83BE38C9E67 /* SettingsView.swift */; };
 		8E9FD9F8F27093A8E906C329 /* MacRightClickApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EF8BA438EC9CA805A15C262 /* MacRightClickApp.swift */; };
 		91B595EAB94DCB413816FA5B /* TemplateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43C3DFCBD13191D21BD1FCB1 /* TemplateStore.swift */; };
+		93FEB1C3814624FFF0D46DD3 /* MacRightClickApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EF8BA438EC9CA805A15C262 /* MacRightClickApp.swift */; };
 		B42E3CB591EACD074A074453 /* LogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05AE769DD42B7C417C5EB09F /* LogStore.swift */; };
 		BA797FD6746F467ECB4798AD /* MenuConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40EBB6B04760A7D035E68D1B /* MenuConfigView.swift */; };
 		C977CD5318DB3497DE899A56 /* LogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A997B5EA222547C1A612C9E6 /* LogView.swift */; };

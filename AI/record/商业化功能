@@ -13,3 +13,18 @@
 
 这些功能是否开启,以及有什么内容,都需要进行页面配置,如果布局,让用户看着不凌乱,用着舒服呢,规划一个方案,给出合理的布局和ui,以及开发方案,先开发那个,和调整那个,
 输出文档到 /Users/wangpenglong/projects/swift/MacRightClick/AI/plan 目录下,中文回复
+
+
+
+
+
+
+
+进入到终端:
+  方案 A（推荐）：使用 Apple Events/AppleScript
+
+  通过 AppleScript 打开 Terminal 并 cd 到目录
+  需要新增权限：com.apple.security.automation.apple-events
+  需要在 Info.plist 加 NSAppleEventsUsageDescription（会弹一次系统授权）
+
+  这个方案 可以只在 用户点击进入终端的时候提示吗, 且只有第一次提示, 其他功能不会有这个弹窗
