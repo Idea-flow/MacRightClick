@@ -26,6 +26,11 @@ final class TemplateStore {
         selectionID = templates.first?.id
     }
 
+    func addTemplate(_ template: FileTemplate) {
+        templates.append(template)
+        selectionID = template.id
+    }
+
     private func persist() {
         Self.storeTemplates(templates, to: defaults, storageKey: storageKey)
         if !AppRuntime.isExtension {

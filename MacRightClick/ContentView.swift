@@ -84,6 +84,7 @@ private struct TemplateWorkspaceView: View {
 
 private struct TemplateListView: View {
     @Bindable var store: TemplateStore
+    @State private var showingAddTemplate = false
 
     var body: some View {
         List(selection: $store.selectionID) {
@@ -97,6 +98,12 @@ private struct TemplateListView: View {
             ToolbarItem(placement: .primaryAction) {
                 Button("恢复默认", action: store.restoreDefaults)
             }
+            ToolbarItem(placement: .primaryAction) {
+                Button("新增模板") { showingAddTemplate = true }
+            }
+        }
+        .sheet(isPresented: $showingAddTemplate) {
+            AddTemplateSheet(store: store)
         }
     }
 }
@@ -178,4 +185,68 @@ private struct TemplateEditorView: View {
 
 #Preview {
     ContentView()
+}
+
+private struct AddTemplateSheet: View {
+    @Bindable var store: TemplateStore
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var displayName = ""
+    @State private var fileExtension = ""
+    @State private var baseName = ""
+    @State private var bodyText = ""
+
+    private var canSave: Bool {
+        !displayName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+        !fileExtension.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("新增模板")
+                .font(.title3.bold())
+
+            Form {
+                TextField("显示名称", text: $displayName)
+                TextField("扩展名（不含点）", text: $fileExtension)
+                TextField("默认文件名", text: $baseName)
+                TextEditor(text: $bodyText)
+                    .frame(minHeight: 160)
+            }
+            .formStyle(.grouped)
+
+            HStack {
+                Spacer()
+                Button("取消") { dismiss() }
+                Button("保存") { saveTemplate() }
+                    .disabled(!canSave)
+            }
+        }
+        .padding()
+        .frame(minWidth: 420, minHeight: 360)
+        .onAppear {
+            if baseName.isEmpty {
+                baseName = "新建文件"
+            }
+        }
+    }
+
+    private func saveTemplate() {
+        let name = displayName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let ext = fileExtension
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .trimmingCharacters(in: CharacterSet(charactersIn: "."))
+        let base = baseName.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        let template = FileTemplate(
+            kind: .custom,
+            displayName: name,
+            fileExtension: ext,
+            isEnabled: true,
+            defaultBaseName: base.isEmpty ? "新建文件" : base,
+            defaultBody: bodyText
+        )
+        store.addTemplate(template)
+        dismiss()
+    }
 }

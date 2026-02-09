@@ -29,7 +29,7 @@ enum FileCreator {
 
     private static func writeFile(for template: FileTemplate, to url: URL) throws {
         switch template.kind {
-        case .text, .markdown:
+        case .text, .markdown, .json, .custom:
             let data = template.defaultBody.data(using: .utf8) ?? Data()
             try data.write(to: url, options: .atomic)
         case .pdf:
