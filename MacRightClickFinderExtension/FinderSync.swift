@@ -4,6 +4,7 @@ import CoreGraphics
 
 final class FinderSync: FIFinderSync {
     private var templates: [FileTemplate] = []
+    private var templateIDsByTag: [Int: UUID] = [:]
 
     override init() {
         super.init()
@@ -36,13 +37,20 @@ final class FinderSync: FIFinderSync {
         AppLogger.log(.info, "右键菜单打开", category: "finder")
 
         let menu = NSMenu(title: "新建文件")
+        menu.autoenablesItems = false
         let parentItem = NSMenuItem(title: "新建文件", action: nil, keyEquivalent: "")
         let submenu = NSMenu(title: "新建文件")
+        submenu.autoenablesItems = false
 
+        templateIDsByTag.removeAll(keepingCapacity: true)
+        var tagCounter = 1
         for template in templates {
-            let item = NSMenuItem(title: template.displayName, action: #selector(createFile(_:)), keyEquivalent: "")
+            let item = NSMenuItem(title: template.displayName, action: #selector(FinderSync.createFile(_:)), keyEquivalent: "")
             item.target = self
-            item.representedObject = template
+            item.isEnabled = true
+            item.tag = tagCounter
+            templateIDsByTag[tagCounter] = template.id
+            tagCounter += 1
             submenu.addItem(item)
         }
 
@@ -51,8 +59,9 @@ final class FinderSync: FIFinderSync {
         return menu
     }
 
-    @objc private func createFile(_ sender: NSMenuItem) {
-        guard let template = sender.representedObject as? FileTemplate else {
+    @objc func createFile(_ sender: NSMenuItem) {
+        guard let templateID = templateIDsByTag[sender.tag] else {
+            AppLogger.log(.warning, "无法找到模板ID，tag: \(sender.tag)", category: "finder")
             return
         }
 
@@ -64,8 +73,10 @@ final class FinderSync: FIFinderSync {
 
         let directoryURL = targetURL.hasDirectoryPath ? targetURL : targetURL.deletingLastPathComponent()
         DistributedMessenger.shared.sendToApp(
-            MessagePayload(action: "create-file", target: directoryURL.path, template: template)
+            MessagePayload(action: "create-file", target: directoryURL.path, templateID: templateID)
         )
+        AppLogger.log(.info, "已点击菜单: \(sender.title)", category: "finder")
+        AppLogger.log(.info, "发送创建请求: \(directoryURL.path) templateID: \(templateID)", category: "finder")
         AppLogger.log(.info, "已请求创建文件: \(directoryURL.path)", category: "finder")
     }
 }

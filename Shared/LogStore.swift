@@ -55,13 +55,15 @@ enum AppLogger {
         }
 
         if AppRuntime.isExtension {
-            DistributedNotificationCenter.default()
-                .post(name: LogStore.distributedLogNotification, object: nil, userInfo: [
-                    LogStore.userInfoLevelKey: level.rawValue,
-                    LogStore.userInfoCategoryKey: category,
-                    LogStore.userInfoMessageKey: message,
-                    LogStore.userInfoTimestampKey: Date().timeIntervalSince1970
-                ])
+            DistributedMessenger.shared.sendToApp(
+                MessagePayload(
+                    action: "log",
+                    level: level.rawValue,
+                    category: category,
+                    message: message,
+                    timestamp: Date().timeIntervalSince1970
+                )
+            )
             return
         }
 
@@ -78,27 +80,18 @@ enum AppRuntime {
 final class LogStore {
     static let shared = LogStore()
     static let didAppendNotification = Notification.Name("LogStoreDidAppend")
-    static let distributedLogNotification = Notification.Name("MacRightClickDistributedLog")
-    static let userInfoLevelKey = "level"
-    static let userInfoCategoryKey = "category"
-    static let userInfoMessageKey = "message"
-    static let userInfoTimestampKey = "timestamp"
-
     private let queue = DispatchQueue(label: "LogStoreQueue")
     private let fileURL: URL
-    private var distributedObserver: NSObjectProtocol?
 
     private init() {
         self.fileURL = Self.defaultLogFileURL()
         if !AppRuntime.isExtension {
-            distributedObserver = DistributedNotificationCenter.default()
-                .addObserver(
-                    forName: Self.distributedLogNotification,
-                    object: nil,
-                    queue: .main
-                ) { [weak self] notification in
-                    self?.handleDistributedLog(notification.userInfo)
+            DistributedMessenger.shared.onFromExtension { [weak self] payload in
+                guard payload.action == "log" else {
+                    return
                 }
+                self?.handleDistributedLogPayload(payload)
+            }
         }
     }
 
@@ -160,16 +153,15 @@ final class LogStore {
         NotificationCenter.default.post(name: Self.didAppendNotification, object: nil)
     }
 
-    private func handleDistributedLog(_ userInfo: [AnyHashable: Any]?) {
-        guard let userInfo,
-              let levelRaw = userInfo[Self.userInfoLevelKey] as? String,
+    private func handleDistributedLogPayload(_ payload: MessagePayload) {
+        guard let levelRaw = payload.level,
               let level = LogLevel(rawValue: levelRaw),
-              let category = userInfo[Self.userInfoCategoryKey] as? String,
-              let message = userInfo[Self.userInfoMessageKey] as? String else {
+              let category = payload.category,
+              let message = payload.message else {
             return
         }
 
-        let timestamp = (userInfo[Self.userInfoTimestampKey] as? TimeInterval) ?? Date().timeIntervalSince1970
+        let timestamp = payload.timestamp ?? Date().timeIntervalSince1970
         let date = Date(timeIntervalSince1970: timestamp)
         append(LogEntry(date: date, level: level, category: category, message: message))
     }

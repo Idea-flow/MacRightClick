@@ -18,9 +18,22 @@ struct MacRightClickApp: App {
 
     private func setupExtensionCommunication() {
         DistributedMessenger.shared.onFromExtension { payload in
+            if payload.action == "log" {
+                // LogStore already consumes log payloads; skip app-level warnings.
+                return
+            }
+
+            AppLogger.log(.info, "收到消息: \(payload.action)", category: "app")
             guard payload.action == "create-file",
                   let target = payload.target,
-                  let template = payload.template else {
+                  let templateID = payload.templateID else {
+                AppLogger.log(.warning, "消息缺少必要字段: \(payload)", category: "app")
+                return
+            }
+
+            let enabled = TemplateStore.enabledTemplates()
+            guard let template = enabled.first(where: { $0.id == templateID }) else {
+                AppLogger.log(.warning, "未找到模板: \(templateID)", category: "app")
                 return
             }
 

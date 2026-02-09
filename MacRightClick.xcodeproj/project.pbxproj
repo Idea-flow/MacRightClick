@@ -10,12 +10,18 @@
 		0605E792D4706BDD95A684BB /* AuthorizedFoldersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B03CF2B468F1B6F5E5BDF489 /* AuthorizedFoldersView.swift */; };
 		1A9975288E46EBBBF1C57CE1 /* LogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05AE769DD42B7C417C5EB09F /* LogStore.swift */; };
 		23CE575E654F9D40883E792F /* FinderSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7206CC57FC1E452ECFEEB9 /* FinderSync.swift */; };
+		27A4B4208B5A7CA0B2413936 /* LogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05AE769DD42B7C417C5EB09F /* LogStore.swift */; };
 		3300C73E263EEFD8F967A4AE /* FileCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B719FF09BB9BFFFCFBE5789E /* FileCreator.swift */; };
+		3327F07153A599AF9F3AADAE /* LogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05AE769DD42B7C417C5EB09F /* LogStore.swift */; };
+		48AD14F5E651F7A6432DC3FC /* LogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05AE769DD42B7C417C5EB09F /* LogStore.swift */; };
 		59C9205E9BB6268E019017CE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 233F8EC4446307D237AB97DA /* ContentView.swift */; };
 		78903CFDDAF663BBF802D620 /* MacRightClickFinderExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 0A19C171D937A72BFFB2F88C /* MacRightClickFinderExtension.appex */; };
+		850983F3964D91574621B915 /* MacRightClickApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EF8BA438EC9CA805A15C262 /* MacRightClickApp.swift */; };
 		8E9FD9F8F27093A8E906C329 /* MacRightClickApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EF8BA438EC9CA805A15C262 /* MacRightClickApp.swift */; };
 		91B595EAB94DCB413816FA5B /* TemplateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43C3DFCBD13191D21BD1FCB1 /* TemplateStore.swift */; };
+		B42E3CB591EACD074A074453 /* LogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05AE769DD42B7C417C5EB09F /* LogStore.swift */; };
 		C977CD5318DB3497DE899A56 /* LogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A997B5EA222547C1A612C9E6 /* LogView.swift */; };
+		CFE2F2179561313BC7C22E34 /* FinderSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7206CC57FC1E452ECFEEB9 /* FinderSync.swift */; };
 		DE1BCD2FC33AC6376ED518B5 /* AuthorizedFolderStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 089CC7ADC531646B79FD1F93 /* AuthorizedFolderStore.swift */; };
 		F15CFF46E89ECB17BA5812AB /* Messenger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62FE642907BFC078EB715517 /* Messenger.swift */; };
 /* End PBXBuildFile section */
@@ -49,6 +55,7 @@
 		B03CF2B468F1B6F5E5BDF489 /* AuthorizedFoldersView.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; lastKnownFileType = sourcecode.swift; name = AuthorizedFoldersView.swift; path = MacRightClick/AuthorizedFoldersView.swift; sourceTree = SOURCE_ROOT; };
 		B719FF09BB9BFFFCFBE5789E /* FileCreator.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; name = FileCreator.swift; path = Shared/FileCreator.swift; sourceTree = SOURCE_ROOT; };
 		DB494B770E08E47A7828BC04 /* workspace.xml */ = {isa = PBXFileReference; explicitFileType = text.xml; name = workspace.xml; path = .idea/workspace.xml; sourceTree = SOURCE_ROOT; };
+		DFD2F425A2BB2EC57906B2D9 /* MacRightClick.entitlements */ = {isa = PBXFileReference; explicitFileType = text.plist.entitlements; lastKnownFileType = text.plist.entitlements; name = MacRightClick.entitlements; path = MacRightClick/MacRightClick.entitlements; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -106,6 +113,7 @@
 				089CC7ADC531646B79FD1F93 /* AuthorizedFolderStore.swift */,
 				B719FF09BB9BFFFCFBE5789E /* FileCreator.swift */,
 				B03CF2B468F1B6F5E5BDF489 /* AuthorizedFoldersView.swift */,
+				DFD2F425A2BB2EC57906B2D9 /* MacRightClick.entitlements */,
 			);
 			sourceTree = "<group>";
 		};
@@ -230,6 +238,7 @@
 			files = (
 				23CE575E654F9D40883E792F /* FinderSync.swift in Sources */,
 				F15CFF46E89ECB17BA5812AB /* Messenger.swift in Sources */,
+				B42E3CB591EACD074A074453 /* LogStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -246,6 +255,11 @@
 				3300C73E263EEFD8F967A4AE /* FileCreator.swift in Sources */,
 				0605E792D4706BDD95A684BB /* AuthorizedFoldersView.swift in Sources */,
 				F15CFF46E89ECB17BA5812AB /* Messenger.swift in Sources */,
+				27A4B4208B5A7CA0B2413936 /* LogStore.swift in Sources */,
+				3327F07153A599AF9F3AADAE /* LogStore.swift in Sources */,
+				48AD14F5E651F7A6432DC3FC /* LogStore.swift in Sources */,
+				CFE2F2179561313BC7C22E34 /* FinderSync.swift in Sources */,
+				850983F3964D91574621B915 /* MacRightClickApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

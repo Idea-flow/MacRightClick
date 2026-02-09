@@ -5,14 +5,33 @@ struct MessagePayload: Codable {
     var target: String?
     var targets: [String]
     var template: FileTemplate?
+    var templateID: UUID?
     var templates: [FileTemplate]
+    var level: String?
+    var category: String?
+    var message: String?
+    var timestamp: TimeInterval?
 
-    init(action: String, target: String? = nil, targets: [String] = [], template: FileTemplate? = nil, templates: [FileTemplate] = []) {
+    init(action: String,
+         target: String? = nil,
+         targets: [String] = [],
+         template: FileTemplate? = nil,
+         templateID: UUID? = nil,
+         templates: [FileTemplate] = [],
+         level: String? = nil,
+         category: String? = nil,
+         message: String? = nil,
+         timestamp: TimeInterval? = nil) {
         self.action = action
         self.target = target
         self.targets = targets
         self.template = template
+        self.templateID = templateID
         self.templates = templates
+        self.level = level
+        self.category = category
+        self.message = message
+        self.timestamp = timestamp
     }
 }
 
@@ -22,6 +41,8 @@ final class DistributedMessenger {
     private let center = DistributedNotificationCenter.default()
     private var handlersFromExtension: [(MessagePayload) -> Void] = []
     private var handlersFromApp: [(MessagePayload) -> Void] = []
+    private var observerFromExtension: NSObjectProtocol?
+    private var observerFromApp: NSObjectProtocol?
 
     private init() {}
 
@@ -34,15 +55,27 @@ final class DistributedMessenger {
     }
 
     func onFromExtension(_ handler: @escaping (MessagePayload) -> Void) {
-        if handlersFromExtension.isEmpty {
-            center.addObserver(self, selector: #selector(receivedFromExtension(_:)), name: Self.fromExtension, object: nil)
+        if observerFromExtension == nil {
+            observerFromExtension = center.addObserver(
+                forName: Self.fromExtension,
+                object: nil,
+                queue: .main
+            ) { [weak self] notification in
+                self?.handle(notification, handlers: self?.handlersFromExtension ?? [])
+            }
         }
         handlersFromExtension.append(handler)
     }
 
     func onFromApp(_ handler: @escaping (MessagePayload) -> Void) {
-        if handlersFromApp.isEmpty {
-            center.addObserver(self, selector: #selector(receivedFromApp(_:)), name: Self.fromApp, object: nil)
+        if observerFromApp == nil {
+            observerFromApp = center.addObserver(
+                forName: Self.fromApp,
+                object: nil,
+                queue: .main
+            ) { [weak self] notification in
+                self?.handle(notification, handlers: self?.handlersFromApp ?? [])
+            }
         }
         handlersFromApp.append(handler)
     }
@@ -55,22 +88,13 @@ final class DistributedMessenger {
         center.postNotificationName(name, object: string, userInfo: nil, deliverImmediately: true)
     }
 
-    @objc private func receivedFromExtension(_ notification: Notification) {
+    private func handle(_ notification: Notification, handlers: [(MessagePayload) -> Void]) {
         guard let string = notification.object as? String,
               let data = string.data(using: .utf8),
               let payload = try? JSONDecoder().decode(MessagePayload.self, from: data) else {
             return
         }
-        handlersFromExtension.forEach { $0(payload) }
-    }
-
-    @objc private func receivedFromApp(_ notification: Notification) {
-        guard let string = notification.object as? String,
-              let data = string.data(using: .utf8),
-              let payload = try? JSONDecoder().decode(MessagePayload.self, from: data) else {
-            return
-        }
-        handlersFromApp.forEach { $0(payload) }
+        handlers.forEach { $0(payload) }
     }
 
     private static let fromExtension = Notification.Name("MacRightClick.FromExtension")
