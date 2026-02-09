@@ -9,7 +9,7 @@
     <key>NSExtension</key>
     <dict>
         <key>NSExtensionPointIdentifier</key>
-        <string>com.apple.finder-sync</string>
+        <string>com.apple.FinderSync</string>
         <key>NSExtensionPrincipalClass</key>
         <string>$(PRODUCT_MODULE_NAME).FinderSync</string>
     </dict>
