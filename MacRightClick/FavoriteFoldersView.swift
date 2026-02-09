@@ -38,6 +38,7 @@ struct FavoriteFoldersView: View {
         .onChange(of: folders) { _, _ in
             // Persist changes when toggling enabled states or editing list.
             FavoriteFolderStore.save(folders)
+            syncToExtension()
         }
     }
 
@@ -62,10 +63,19 @@ struct FavoriteFoldersView: View {
         }
         let name = url.lastPathComponent
         folders.append(FavoriteFolder(name: name, path: path, isEnabled: true))
+        syncToExtension()
     }
 
     private func removeSelected() {
         folders.removeAll { selection.contains($0.id) }
         selection.removeAll()
+        syncToExtension()
+    }
+
+    private func syncToExtension() {
+        let enabled = folders.filter { $0.isEnabled }
+        DistributedMessenger.shared.sendToExtension(
+            MessagePayload(action: "update-favorites", favoriteFolders: enabled, favoriteApps: nil)
+        )
     }
 }

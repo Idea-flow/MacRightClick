@@ -6,6 +6,8 @@ final class FinderSync: FIFinderSync {
     private var templates: [FileTemplate] = []
     private var templateIDsByTag: [Int: UUID] = [:]
     private var menuConfig: MenuConfig = .default
+    private var favoriteFolders: [FavoriteFolder] = []
+    private var favoriteApps: [FavoriteApp] = []
 
     override init() {
         super.init()
@@ -24,6 +26,14 @@ final class FinderSync: FIFinderSync {
                     self.menuConfig = config
                     AppLogger.log(.info, "菜单配置已更新", category: "finder")
                 }
+            case "update-favorites":
+                if let folders = payload.favoriteFolders {
+                    self.favoriteFolders = folders
+                }
+                if let apps = payload.favoriteApps {
+                    self.favoriteApps = apps
+                }
+                AppLogger.log(.info, "常用列表已更新", category: "finder")
             default:
                 break
             }
@@ -51,6 +61,12 @@ final class FinderSync: FIFinderSync {
             }
             if menuConfig.container.openTerminalEnabled {
                 addOpenTerminalMenu(to: menu)
+            }
+            if !favoriteFolders.isEmpty {
+                addFavoriteFoldersMenu(to: menu)
+            }
+            if !favoriteApps.isEmpty {
+                addFavoriteAppsMenu(to: menu)
             }
         case .contextualMenuForItems: // items
             if menuConfig.items.copyPathEnabled {
@@ -133,6 +149,40 @@ private extension FinderSync {
         item.isEnabled = true
         menu.addItem(item)
     }
+
+    func addFavoriteFoldersMenu(to menu: NSMenu) {
+        let parentItem = NSMenuItem(title: "常用目录", action: nil, keyEquivalent: "")
+        let submenu = NSMenu(title: "常用目录")
+        submenu.autoenablesItems = false
+
+        for folder in favoriteFolders {
+            let item = NSMenuItem(title: folder.name, action: #selector(openFavoriteFolder(_:)), keyEquivalent: "")
+            item.target = self
+            item.toolTip = folder.path
+            item.representedObject = folder
+            submenu.addItem(item)
+        }
+
+        parentItem.submenu = submenu
+        menu.addItem(parentItem)
+    }
+
+    func addFavoriteAppsMenu(to menu: NSMenu) {
+        let parentItem = NSMenuItem(title: "常用 App", action: nil, keyEquivalent: "")
+        let submenu = NSMenu(title: "常用 App")
+        submenu.autoenablesItems = false
+
+        for app in favoriteApps {
+            let item = NSMenuItem(title: app.name, action: #selector(openFavoriteApp(_:)), keyEquivalent: "")
+            item.target = self
+            item.toolTip = app.path
+            item.representedObject = app
+            submenu.addItem(item)
+        }
+
+        parentItem.submenu = submenu
+        menu.addItem(parentItem)
+    }
 }
 
 // MARK: - Copy Actions
@@ -172,6 +222,26 @@ private extension FinderSync {
             MessagePayload(action: "open-terminal", target: url.path)
         )
         AppLogger.log(.info, "已请求打开终端: \(url.path)", category: "finder")
+    }
+
+    @objc func openFavoriteFolder(_ sender: NSMenuItem) {
+        guard let folder = sender.representedObject as? FavoriteFolder else {
+            return
+        }
+        DistributedMessenger.shared.sendToApp(
+            MessagePayload(action: "open-favorite-folder", target: folder.path)
+        )
+        AppLogger.log(.info, "已请求打开目录: \(folder.path)", category: "finder")
+    }
+
+    @objc func openFavoriteApp(_ sender: NSMenuItem) {
+        guard let app = sender.representedObject as? FavoriteApp else {
+            return
+        }
+        DistributedMessenger.shared.sendToApp(
+            MessagePayload(action: "open-favorite-app", target: app.path)
+        )
+        AppLogger.log(.info, "已请求打开 App: \(app.path)", category: "finder")
     }
 
     func writePathsToPasteboard(_ paths: [String]) {

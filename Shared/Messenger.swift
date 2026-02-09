@@ -9,6 +9,8 @@ struct MessagePayload: Codable {
     var templates: [FileTemplate]
     var copyPathsEnabled: Bool?
     var menuConfig: MenuConfig?
+    var favoriteFolders: [FavoriteFolder]?
+    var favoriteApps: [FavoriteApp]?
     var level: String?
     var category: String?
     var message: String?
@@ -22,6 +24,8 @@ struct MessagePayload: Codable {
          templates: [FileTemplate] = [],
          copyPathsEnabled: Bool? = nil,
          menuConfig: MenuConfig? = nil,
+         favoriteFolders: [FavoriteFolder]? = nil,
+         favoriteApps: [FavoriteApp]? = nil,
          level: String? = nil,
          category: String? = nil,
          message: String? = nil,
@@ -34,6 +38,8 @@ struct MessagePayload: Codable {
         self.templates = templates
         self.copyPathsEnabled = copyPathsEnabled
         self.menuConfig = menuConfig
+        self.favoriteFolders = favoriteFolders
+        self.favoriteApps = favoriteApps
         self.level = level
         self.category = category
         self.message = message

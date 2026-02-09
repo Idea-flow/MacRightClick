@@ -11,6 +11,7 @@ struct MacRightClickApp: App {
         sendScopeUpdate()
         sendTemplatesUpdate()
         sendMenuConfigUpdate()
+        sendFavoritesUpdate()
         DispatchQueue.main.async {
             DockVisibility.apply(showDockIcon: UserDefaults.appGroup.object(forKey: "ShowDockIcon") as? Bool ?? true)
         }
@@ -38,6 +39,14 @@ struct MacRightClickApp: App {
 
             if payload.action == "open-terminal", let target = payload.target {
                 openTerminal(at: target)
+                return
+            }
+            if payload.action == "open-favorite-folder", let target = payload.target {
+                openFolder(at: target)
+                return
+            }
+            if payload.action == "open-favorite-app", let target = payload.target {
+                openApp(at: target)
                 return
             }
 
@@ -87,6 +96,25 @@ struct MacRightClickApp: App {
     private func sendMenuConfigUpdate() {
         let config = MenuConfigStore.load()
         DistributedMessenger.shared.sendToExtension(MessagePayload(action: "update-menu-config", menuConfig: config))
+    }
+
+    private func sendFavoritesUpdate() {
+        let folders = FavoriteFolderStore.load().filter { $0.isEnabled }
+        let apps = FavoriteAppStore.load().filter { $0.isEnabled }
+        DistributedMessenger.shared.sendToExtension(
+            MessagePayload(action: "update-favorites", favoriteFolders: folders, favoriteApps: apps)
+        )
+    }
+
+    private func openFolder(at path: String) {
+        let url = URL(fileURLWithPath: path, isDirectory: true)
+        NSWorkspace.shared.open(url)
+    }
+
+    private func openApp(at path: String) {
+        let url = URL(fileURLWithPath: path, isDirectory: false)
+        let configuration = NSWorkspace.OpenConfiguration()
+        NSWorkspace.shared.openApplication(at: url, configuration: configuration, completionHandler: nil)
     }
 
     private func openTerminal(at path: String) {

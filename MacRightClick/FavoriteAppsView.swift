@@ -43,6 +43,7 @@ struct FavoriteAppsView: View {
         .onChange(of: apps) { _, _ in
             // Persist changes when toggling enabled states or editing list.
             FavoriteAppStore.save(apps)
+            syncToExtension()
         }
     }
 
@@ -74,14 +75,23 @@ struct FavoriteAppsView: View {
             return
         }
         apps.append(FavoriteApp(name: name, bundleIdentifier: bundleID, path: path, isEnabled: true))
+        syncToExtension()
     }
 
     private func removeSelected() {
         apps.removeAll { selection.contains($0.id) }
         selection.removeAll()
+        syncToExtension()
     }
 
     private func appIcon(at path: String) -> NSImage {
         NSWorkspace.shared.icon(forFile: path)
+    }
+
+    private func syncToExtension() {
+        let enabled = apps.filter { $0.isEnabled }
+        DistributedMessenger.shared.sendToExtension(
+            MessagePayload(action: "update-favorites", favoriteFolders: nil, favoriteApps: enabled)
+        )
     }
 }
