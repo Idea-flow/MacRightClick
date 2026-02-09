@@ -18,6 +18,10 @@ struct ContentView: View {
                 TemplateWorkspaceView(store: store)
             case .menuConfig:
                 MenuConfigView()
+            case .favoriteFolders:
+                FavoriteFoldersView()
+            case .favoriteApps:
+                FavoriteAppsView()
             case .logs:
                 LogView()
             case .authorizedFolders:
@@ -57,6 +61,8 @@ struct ContentView: View {
 private enum SidebarItem: String, Hashable, CaseIterable, Identifiable {
     case templates
     case menuConfig
+    case favoriteFolders
+    case favoriteApps
     case logs
     case authorizedFolders
     case settings
@@ -74,6 +80,10 @@ private struct SidebarView: View {
                     .tag(SidebarItem.templates)
                 Label("菜单配置", systemImage: "slider.horizontal.3")
                     .tag(SidebarItem.menuConfig)
+                Label("常用目录", systemImage: "folder")
+                    .tag(SidebarItem.favoriteFolders)
+                Label("常用 App", systemImage: "app")
+                    .tag(SidebarItem.favoriteApps)
                 Label("日志", systemImage: "text.justify")
                     .tag(SidebarItem.logs)
                 Label("授权目录", systemImage: "folder.badge.plus")

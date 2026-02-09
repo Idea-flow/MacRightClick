@@ -7,18 +7,22 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		05C4C0732BC72FF9CF494255 /* FavoriteAppsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7897C5434249777AA29E313D /* FavoriteAppsView.swift */; };
 		0605E792D4706BDD95A684BB /* AuthorizedFoldersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B03CF2B468F1B6F5E5BDF489 /* AuthorizedFoldersView.swift */; };
+		095A8DC9257514774A6893D9 /* FavoriteAppStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA3409FBDEF68A438AAAC286 /* FavoriteAppStore.swift */; };
 		1A9975288E46EBBBF1C57CE1 /* LogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05AE769DD42B7C417C5EB09F /* LogStore.swift */; };
 		23CE575E654F9D40883E792F /* FinderSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7206CC57FC1E452ECFEEB9 /* FinderSync.swift */; };
 		27E434F9DDD9200EE4787E81 /* DockVisibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCE6CDF6CC909BD740C84369 /* DockVisibility.swift */; };
 		3300C73E263EEFD8F967A4AE /* FileCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B719FF09BB9BFFFCFBE5789E /* FileCreator.swift */; };
+		55C66EF8F2975627540BCFD7 /* FavoriteFolderStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1BA2C0F842113110D29DC7A /* FavoriteFolderStore.swift */; };
 		57194D372F3A217400E577A2 /* Messenger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62FE642907BFC078EB715517 /* Messenger.swift */; };
+		571955D62F3A452A00E577A2 /* MenuConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8ED63C76E9AE29FA9AC531 /* MenuConfig.swift */; };
 		59C9205E9BB6268E019017CE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 233F8EC4446307D237AB97DA /* ContentView.swift */; };
 		78903CFDDAF663BBF802D620 /* MacRightClickFinderExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 0A19C171D937A72BFFB2F88C /* MacRightClickFinderExtension.appex */; };
 		7CD133925C156C4E8F81E0FB /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98D8C90AA683A83BE38C9E67 /* SettingsView.swift */; };
+		8B9A18895AF8DD3B92618767 /* FavoriteFoldersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17D6917E3A2E18DFBBBA6699 /* FavoriteFoldersView.swift */; };
 		8E9FD9F8F27093A8E906C329 /* MacRightClickApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EF8BA438EC9CA805A15C262 /* MacRightClickApp.swift */; };
 		91B595EAB94DCB413816FA5B /* TemplateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43C3DFCBD13191D21BD1FCB1 /* TemplateStore.swift */; };
-		93FEB1C3814624FFF0D46DD3 /* MacRightClickApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EF8BA438EC9CA805A15C262 /* MacRightClickApp.swift */; };
 		B42E3CB591EACD074A074453 /* LogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05AE769DD42B7C417C5EB09F /* LogStore.swift */; };
 		BA797FD6746F467ECB4798AD /* MenuConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40EBB6B04760A7D035E68D1B /* MenuConfigView.swift */; };
 		C977CD5318DB3497DE899A56 /* LogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A997B5EA222547C1A612C9E6 /* LogView.swift */; };
@@ -46,12 +50,14 @@
 		085A16C60E0A95C11D5601EE /* record1.md */ = {isa = PBXFileReference; explicitFileType = net.daringfireball.markdown; name = record1.md; path = AI/record/record1.md; sourceTree = SOURCE_ROOT; };
 		089CC7ADC531646B79FD1F93 /* AuthorizedFolderStore.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; name = AuthorizedFolderStore.swift; path = Shared/AuthorizedFolderStore.swift; sourceTree = SOURCE_ROOT; };
 		0A19C171D937A72BFFB2F88C /* MacRightClickFinderExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MacRightClickFinderExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		17D6917E3A2E18DFBBBA6699 /* FavoriteFoldersView.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; lastKnownFileType = sourcecode.swift; name = FavoriteFoldersView.swift; path = MacRightClick/FavoriteFoldersView.swift; sourceTree = SOURCE_ROOT; };
 		20348A321C54F96DAFEAAFF0 /* 右键菜单规划与实现方案.md */ = {isa = PBXFileReference; explicitFileType = net.daringfireball.markdown; name = "右键菜单规划与实现方案.md"; path = "AI/plan/右键菜单规划与实现方案.md"; sourceTree = SOURCE_ROOT; };
 		233F8EC4446307D237AB97DA /* ContentView.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; name = ContentView.swift; path = MacRightClick/ContentView.swift; sourceTree = SOURCE_ROOT; };
-		40EBB6B04760A7D035E68D1B /* MenuConfigView.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; lastKnownFileType = sourcecode.swift; name = MenuConfigView.swift; path = MacRightClick/MenuConfigView.swift; sourceTree = SOURCE_ROOT; };
+		40EBB6B04760A7D035E68D1B /* MenuConfigView.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; name = MenuConfigView.swift; path = MacRightClick/MenuConfigView.swift; sourceTree = SOURCE_ROOT; };
 		43C3DFCBD13191D21BD1FCB1 /* TemplateStore.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; name = TemplateStore.swift; path = Shared/TemplateStore.swift; sourceTree = SOURCE_ROOT; };
 		57A55DF92F39C4EF005A6194 /* MacRightClick.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MacRightClick.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		62FE642907BFC078EB715517 /* Messenger.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; name = Messenger.swift; path = Shared/Messenger.swift; sourceTree = SOURCE_ROOT; };
+		7897C5434249777AA29E313D /* FavoriteAppsView.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; lastKnownFileType = sourcecode.swift; name = FavoriteAppsView.swift; path = MacRightClick/FavoriteAppsView.swift; sourceTree = SOURCE_ROOT; };
 		7E7CA3A4AB12D220EE8631E9 /* Contents.json */ = {isa = PBXFileReference; explicitFileType = text.json; name = Contents.json; path = MacRightClick/Assets.xcassets/MenuBarIcon.imageset/Contents.json; sourceTree = SOURCE_ROOT; };
 		7EF8BA438EC9CA805A15C262 /* MacRightClickApp.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; name = MacRightClickApp.swift; path = MacRightClick/MacRightClickApp.swift; sourceTree = SOURCE_ROOT; };
 		98D8C90AA683A83BE38C9E67 /* SettingsView.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; name = SettingsView.swift; path = MacRightClick/SettingsView.swift; sourceTree = SOURCE_ROOT; };
@@ -61,8 +67,11 @@
 		B719FF09BB9BFFFCFBE5789E /* FileCreator.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; name = FileCreator.swift; path = Shared/FileCreator.swift; sourceTree = SOURCE_ROOT; };
 		BCE6CDF6CC909BD740C84369 /* DockVisibility.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; name = DockVisibility.swift; path = MacRightClick/DockVisibility.swift; sourceTree = SOURCE_ROOT; };
 		BF05810270C645D614E89A20 /* 不弹窗.md */ = {isa = PBXFileReference; explicitFileType = net.daringfireball.markdown; name = "不弹窗.md"; path = "AI/record/不弹窗.md"; sourceTree = SOURCE_ROOT; };
+		C1BA2C0F842113110D29DC7A /* FavoriteFolderStore.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; name = FavoriteFolderStore.swift; path = Shared/FavoriteFolderStore.swift; sourceTree = SOURCE_ROOT; };
+		CA3409FBDEF68A438AAAC286 /* FavoriteAppStore.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; name = FavoriteAppStore.swift; path = Shared/FavoriteAppStore.swift; sourceTree = SOURCE_ROOT; };
 		DB494B770E08E47A7828BC04 /* workspace.xml */ = {isa = PBXFileReference; explicitFileType = text.xml; name = workspace.xml; path = .idea/workspace.xml; sourceTree = SOURCE_ROOT; };
 		DFD2F425A2BB2EC57906B2D9 /* MacRightClick.entitlements */ = {isa = PBXFileReference; explicitFileType = text.plist.entitlements; name = MacRightClick.entitlements; path = MacRightClick/MacRightClick.entitlements; sourceTree = SOURCE_ROOT; };
+		E581443D7B4833EE72E1AD06 /* 商业化功能.md */ = {isa = PBXFileReference; explicitFileType = net.daringfireball.markdown; name = "商业化功能.md"; path = "AI/record/商业化功能.md"; sourceTree = SOURCE_ROOT; };
 		FB8ED63C76E9AE29FA9AC531 /* MenuConfig.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; name = MenuConfig.swift; path = Shared/MenuConfig.swift; sourceTree = SOURCE_ROOT; };
 		FF82FB32C7F04D16D2891376 /* 功能.md */ = {isa = PBXFileReference; explicitFileType = net.daringfireball.markdown; name = "功能.md"; path = "AI/record/功能.md"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
@@ -131,6 +140,11 @@
 				20348A321C54F96DAFEAAFF0 /* 右键菜单规划与实现方案.md */,
 				FB8ED63C76E9AE29FA9AC531 /* MenuConfig.swift */,
 				40EBB6B04760A7D035E68D1B /* MenuConfigView.swift */,
+				E581443D7B4833EE72E1AD06 /* 商业化功能.md */,
+				C1BA2C0F842113110D29DC7A /* FavoriteFolderStore.swift */,
+				CA3409FBDEF68A438AAAC286 /* FavoriteAppStore.swift */,
+				17D6917E3A2E18DFBBBA6699 /* FavoriteFoldersView.swift */,
+				7897C5434249777AA29E313D /* FavoriteAppsView.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -256,7 +270,7 @@
 				23CE575E654F9D40883E792F /* FinderSync.swift in Sources */,
 				57194D372F3A217400E577A2 /* Messenger.swift in Sources */,
 				B42E3CB591EACD074A074453 /* LogStore.swift in Sources */,
-				D99EB5DCF15D94C007EF0AEA /* MenuConfig.swift in Sources */,
+				571955D62F3A452A00E577A2 /* MenuConfig.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -277,6 +291,10 @@
 				7CD133925C156C4E8F81E0FB /* SettingsView.swift in Sources */,
 				BA797FD6746F467ECB4798AD /* MenuConfigView.swift in Sources */,
 				D99EB5DCF15D94C007EF0AEA /* MenuConfig.swift in Sources */,
+				8B9A18895AF8DD3B92618767 /* FavoriteFoldersView.swift in Sources */,
+				05C4C0732BC72FF9CF494255 /* FavoriteAppsView.swift in Sources */,
+				55C66EF8F2975627540BCFD7 /* FavoriteFolderStore.swift in Sources */,
+				095A8DC9257514774A6893D9 /* FavoriteAppStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
