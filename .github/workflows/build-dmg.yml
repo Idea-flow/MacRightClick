@@ -16,9 +16,13 @@ jobs:
         id: version
         run: |
           set -euo pipefail
-          INFO_PLIST="MacRightClick/Info.plist"
-          VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$INFO_PLIST")
-          BUILD=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$INFO_PLIST")
+          SETTINGS=$(xcodebuild -showBuildSettings -project MacRightClick.xcodeproj -scheme MacRightClick)
+          VERSION=$(echo "$SETTINGS" | awk -F' = ' '/MARKETING_VERSION/ {print $2; exit}')
+          BUILD=$(echo "$SETTINGS" | awk -F' = ' '/CURRENT_PROJECT_VERSION/ {print $2; exit}')
+          if [ -z "$VERSION" ] || [ -z "$BUILD" ]; then
+            echo "Failed to read MARKETING_VERSION/CURRENT_PROJECT_VERSION"
+            exit 1
+          fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "build=$BUILD" >> "$GITHUB_OUTPUT"
 
