@@ -1,0 +1,15 @@
+右键菜单 有很多功能,
+例如在.contextualMenuForContainer: // 空白区域
+   有新建文件(有二级列表)(已经实现),常用目录(有二级列表),常用app(有二级列表),进入终端(进入的目录是当前文件夹),拷贝路径
+
+例如在.contextualMenuForItems: // items
+   复制当前路径(已经实现),移动到(是个二级列表,从常用目录里选)
+
+例如在 .toolbarItemMenu点击工具栏图标显示的菜单
+  规划一些有用的功能
+
+例如在 .contextualMenuForSidebar 右键点击侧栏显示的菜单
+  规划一些有用的功能
+
+这些功能是否开启,以及有什么内容,都需要进行页面配置,如果布局,让用户看着不凌乱,用着舒服呢,规划一个方案,给出合理的布局和ui,以及开发方案,先开发那个,和调整那个,
+输出文档到 /Users/wangpenglong/projects/swift/MacRightClick/AI/plan 目录下,中文回复

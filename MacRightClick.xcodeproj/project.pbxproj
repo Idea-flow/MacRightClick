@@ -52,6 +52,7 @@
 		085A16C60E0A95C11D5601EE /* record1.md */ = {isa = PBXFileReference; explicitFileType = net.daringfireball.markdown; name = record1.md; path = AI/record/record1.md; sourceTree = SOURCE_ROOT; };
 		089CC7ADC531646B79FD1F93 /* AuthorizedFolderStore.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; name = AuthorizedFolderStore.swift; path = Shared/AuthorizedFolderStore.swift; sourceTree = SOURCE_ROOT; };
 		0A19C171D937A72BFFB2F88C /* MacRightClickFinderExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MacRightClickFinderExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		20348A321C54F96DAFEAAFF0 /* 右键菜单规划与实现方案.md */ = {isa = PBXFileReference; explicitFileType = net.daringfireball.markdown; lastKnownFileType = net.daringfireball.markdown; name = "右键菜单规划与实现方案.md"; path = "AI/plan/右键菜单规划与实现方案.md"; sourceTree = SOURCE_ROOT; };
 		233F8EC4446307D237AB97DA /* ContentView.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; name = ContentView.swift; path = MacRightClick/ContentView.swift; sourceTree = SOURCE_ROOT; };
 		43C3DFCBD13191D21BD1FCB1 /* TemplateStore.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; name = TemplateStore.swift; path = Shared/TemplateStore.swift; sourceTree = SOURCE_ROOT; };
 		57A55DF92F39C4EF005A6194 /* MacRightClick.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MacRightClick.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -131,6 +132,7 @@
 				98D8C90AA683A83BE38C9E67 /* SettingsView.swift */,
 				7E7CA3A4AB12D220EE8631E9 /* Contents.json */,
 				BCE6CDF6CC909BD740C84369 /* DockVisibility.swift */,
+				20348A321C54F96DAFEAAFF0 /* 右键菜单规划与实现方案.md */,
 			);
 			sourceTree = "<group>";
 		};
