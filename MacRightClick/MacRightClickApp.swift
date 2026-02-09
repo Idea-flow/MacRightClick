@@ -160,13 +160,11 @@ struct MacRightClickApp: App {
         if !trimmedBundleID.isEmpty {
             if let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: trimmedBundleID) {
                 AppLogger.log(.info, "通过 bundleID 找到 App: \(trimmedBundleID) -> \(url.path)", category: "app")
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                    NSWorkspace.shared.openApplication(at: url, configuration: configuration) { _, error in
-                        if let error {
-                            AppLogger.log(.error, "打开 App 失败: \(url.path) \(error.localizedDescription)", category: "app")
-                        } else {
-                            AppLogger.log(.info, "打开 App 成功: \(url.path)", category: "app")
-                        }
+                NSWorkspace.shared.openApplication(at: url, configuration: configuration) { _, error in
+                    if let error {
+                        AppLogger.log(.error, "打开 App 失败: \(url.path) \(error.localizedDescription)", category: "app")
+                    } else {
+                        AppLogger.log(.info, "打开 App 成功: \(url.path)", category: "app")
                     }
                 }
                 return
@@ -185,13 +183,11 @@ struct MacRightClickApp: App {
             AppLogger.log(.error, "打开 App 失败：路径不存在 \(url.path)", category: "app")
             return
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            NSWorkspace.shared.openApplication(at: url, configuration: configuration) { _, error in
-                if let error {
-                    AppLogger.log(.error, "打开 App 失败: \(url.path) \(error.localizedDescription)", category: "app")
-                } else {
-                    AppLogger.log(.info, "打开 App 成功: \(url.path)", category: "app")
-                }
+        NSWorkspace.shared.openApplication(at: url, configuration: configuration) { _, error in
+            if let error {
+                AppLogger.log(.error, "打开 App 失败: \(url.path) \(error.localizedDescription)", category: "app")
+            } else {
+                AppLogger.log(.info, "打开 App 成功: \(url.path)", category: "app")
             }
         }
     }
