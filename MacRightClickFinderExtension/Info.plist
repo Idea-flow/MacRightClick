@@ -2,8 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>CFBundleDisplayName</key>
-    <string>MacRightClick Finder Extension</string>
+	<key>CFBundleDisplayName</key>
+	<string>MacRightClick Finder Extension</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.biliww.MacRightClick.FinderExtension</string>
     <key>NSExtension</key>
     <dict>
         <key>NSExtensionPointIdentifier</key>
