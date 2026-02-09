@@ -32,6 +32,14 @@ struct LogEntry: Codable, Identifiable, Hashable {
         self.category = category
         self.message = message
     }
+
+    init(id: UUID = UUID(), date: Date, level: LogLevel, category: String, message: String) {
+        self.id = id
+        self.date = date
+        self.level = level
+        self.category = category
+        self.message = message
+    }
 }
 
 enum AppLogger {
@@ -46,9 +54,17 @@ enum AppLogger {
             logger.error("\(message, privacy: .public)")
         }
 
-        guard !AppRuntime.isExtension else {
+        if AppRuntime.isExtension {
+            DistributedNotificationCenter.default()
+                .post(name: LogStore.distributedLogNotification, object: nil, userInfo: [
+                    LogStore.userInfoLevelKey: level.rawValue,
+                    LogStore.userInfoCategoryKey: category,
+                    LogStore.userInfoMessageKey: message,
+                    LogStore.userInfoTimestampKey: Date().timeIntervalSince1970
+                ])
             return
         }
+
         LogStore.shared.append(LogEntry(level: level, category: category, message: message))
     }
 }
@@ -62,12 +78,28 @@ enum AppRuntime {
 final class LogStore {
     static let shared = LogStore()
     static let didAppendNotification = Notification.Name("LogStoreDidAppend")
+    static let distributedLogNotification = Notification.Name("MacRightClickDistributedLog")
+    static let userInfoLevelKey = "level"
+    static let userInfoCategoryKey = "category"
+    static let userInfoMessageKey = "message"
+    static let userInfoTimestampKey = "timestamp"
 
     private let queue = DispatchQueue(label: "LogStoreQueue")
     private let fileURL: URL
+    private var distributedObserver: NSObjectProtocol?
 
     private init() {
         self.fileURL = Self.defaultLogFileURL()
+        if !AppRuntime.isExtension {
+            distributedObserver = DistributedNotificationCenter.default()
+                .addObserver(
+                    forName: Self.distributedLogNotification,
+                    object: nil,
+                    queue: .main
+                ) { [weak self] notification in
+                    self?.handleDistributedLog(notification.userInfo)
+                }
+        }
     }
 
     func append(_ entry: LogEntry) {
@@ -126,6 +158,20 @@ final class LogStore {
             try? FileManager.default.removeItem(at: fileURL)
         }
         NotificationCenter.default.post(name: Self.didAppendNotification, object: nil)
+    }
+
+    private func handleDistributedLog(_ userInfo: [AnyHashable: Any]?) {
+        guard let userInfo,
+              let levelRaw = userInfo[Self.userInfoLevelKey] as? String,
+              let level = LogLevel(rawValue: levelRaw),
+              let category = userInfo[Self.userInfoCategoryKey] as? String,
+              let message = userInfo[Self.userInfoMessageKey] as? String else {
+            return
+        }
+
+        let timestamp = (userInfo[Self.userInfoTimestampKey] as? TimeInterval) ?? Date().timeIntervalSince1970
+        let date = Date(timeIntervalSince1970: timestamp)
+        append(LogEntry(date: date, level: level, category: category, message: message))
     }
 
     private func ensureDirectoryExists() throws {

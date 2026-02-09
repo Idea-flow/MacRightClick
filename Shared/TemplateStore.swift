@@ -28,6 +28,12 @@ final class TemplateStore {
 
     private func persist() {
         Self.storeTemplates(templates, to: defaults, storageKey: storageKey)
+        if !AppRuntime.isExtension {
+            let enabled = templates.filter { $0.isEnabled }
+            DistributedMessenger.shared.sendToExtension(
+                MessagePayload(action: "update-templates", templates: enabled)
+            )
+        }
     }
 
     static func loadTemplates(from defaults: UserDefaults = .appGroup, storageKey: String = "FileTemplates") -> [FileTemplate] {

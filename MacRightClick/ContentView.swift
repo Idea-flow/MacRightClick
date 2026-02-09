@@ -15,6 +15,8 @@ struct ContentView: View {
                 TemplateWorkspaceView(store: store)
             case .logs:
                 LogView()
+            case .authorizedFolders:
+                AuthorizedFoldersView()
             }
         }
         .frame(minWidth: 860, minHeight: 520)
@@ -24,6 +26,7 @@ struct ContentView: View {
 private enum SidebarItem: String, Hashable, CaseIterable, Identifiable {
     case templates
     case logs
+    case authorizedFolders
 
     var id: String { rawValue }
 }
@@ -38,6 +41,8 @@ private struct SidebarView: View {
                     .tag(SidebarItem.templates)
                 Label("日志", systemImage: "text.justify")
                     .tag(SidebarItem.logs)
+                Label("授权目录", systemImage: "folder.badge.plus")
+                    .tag(SidebarItem.authorizedFolders)
             }
         }
         .listStyle(.sidebar)

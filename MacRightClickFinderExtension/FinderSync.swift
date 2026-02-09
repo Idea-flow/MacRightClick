@@ -3,11 +3,25 @@ import FinderSync
 import CoreGraphics
 
 final class FinderSync: FIFinderSync {
+    private var templates: [FileTemplate] = []
+
     override init() {
         super.init()
-        FIFinderSyncController.default().directoryURLs = [URL(fileURLWithPath: "/Users/")]
+        FIFinderSyncController.default().directoryURLs = []
+        DistributedMessenger.shared.onFromApp { payload in
+            switch payload.action {
+            case "update-scope":
+                let urls = payload.targets.map { URL(fileURLWithPath: $0) }
+                FIFinderSyncController.default().directoryURLs = Set(urls)
+                AppLogger.log(.info, "已更新授权目录: \(payload.targets.joined(separator: ", "))", category: "finder")
+            case "update-templates":
+                self.templates = payload.templates
+                AppLogger.log(.info, "已更新模板列表: \(payload.templates.count) 个", category: "finder")
+            default:
+                break
+            }
+        }
         AppLogger.log(.info, "Finder 扩展启动", category: "finder")
-//        AppLogger.log(.info, "directoryURLs: \(scopeURLs.map { $0.path }.joined(separator: ", "))", category: "finder")
     }
 
     override func menu(for menuKind: FIMenuKind) -> NSMenu? {
@@ -15,7 +29,6 @@ final class FinderSync: FIFinderSync {
             return nil
         }
 
-        let templates = TemplateStore.enabledTemplates()
         guard !templates.isEmpty else {
             AppLogger.log(.warning, "未启用任何模板，菜单不显示", category: "finder")
             return nil
@@ -50,61 +63,9 @@ final class FinderSync: FIFinderSync {
         }
 
         let directoryURL = targetURL.hasDirectoryPath ? targetURL : targetURL.deletingLastPathComponent()
-        let sanitizedBaseName = sanitizeBaseName(template.defaultBaseName)
-        let baseName = sanitizedBaseName.isEmpty ? "未命名" : sanitizedBaseName
-        let fileURL = uniqueFileURL(in: directoryURL, baseName: baseName, fileExtension: template.fileExtension)
-
-        do {
-            try writeFile(for: template, to: fileURL)
-            AppLogger.log(.info, "创建文件成功: \(fileURL.path)", category: "finder")
-        } catch {
-            AppLogger.log(.error, "创建文件失败: \(fileURL.path)", category: "finder")
-            NSSound.beep()
-        }
-    }
-}
-
-private func sanitizeBaseName(_ name: String) -> String {
-    let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
-    let invalidCharacters = CharacterSet(charactersIn: "/:")
-    let sanitized = trimmed.components(separatedBy: invalidCharacters).joined(separator: "-")
-    return sanitized.replacingOccurrences(of: "  ", with: " ")
-}
-
-private func uniqueFileURL(in directoryURL: URL, baseName: String, fileExtension: String) -> URL {
-    var candidate = directoryURL.appendingPathComponent("\(baseName).\(fileExtension)")
-    var counter = 2
-    while FileManager.default.fileExists(atPath: candidate.path) {
-        candidate = directoryURL.appendingPathComponent("\(baseName) \(counter).\(fileExtension)")
-        counter += 1
-    }
-    return candidate
-}
-
-private func writeFile(for template: FileTemplate, to url: URL) throws {
-    switch template.kind {
-    case .text, .markdown:
-        let data = template.defaultBody.data(using: .utf8) ?? Data()
-        try data.write(to: url, options: .atomic)
-    case .pdf:
-        let data = PDFBuilder.makeBlankPDF(title: template.defaultBaseName)
-        try data.write(to: url, options: .atomic)
-    }
-}
-
-private enum PDFBuilder {
-    static func makeBlankPDF(title: String) -> Data {
-        let data = NSMutableData()
-        var mediaBox = CGRect(x: 0, y: 0, width: 612, height: 792)
-        guard let consumer = CGDataConsumer(data: data as CFMutableData),
-              let context = CGContext(consumer: consumer, mediaBox: &mediaBox, nil) else {
-            return Data()
-        }
-
-        let metadata = [kCGPDFContextTitle as String: title]
-        context.beginPDFPage(metadata as CFDictionary)
-        context.endPDFPage()
-        context.closePDF()
-        return data as Data
+        DistributedMessenger.shared.sendToApp(
+            MessagePayload(action: "create-file", target: directoryURL.path, template: template)
+        )
+        AppLogger.log(.info, "已请求创建文件: \(directoryURL.path)", category: "finder")
     }
 }
