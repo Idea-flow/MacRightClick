@@ -50,14 +50,14 @@ struct MacRightClickApp: App {
             }
 
             let directoryURL = URL(fileURLWithPath: target)
-            guard AuthorizedFolderStore.isAuthorized(directoryURL) else {
+            guard let scopeURL = AuthorizedFolderStore.nearestAuthorizedURL(for: directoryURL) else {
                 AppLogger.log(.warning, "目录未授权: \(directoryURL.path)", category: "authorization")
                 return
             }
 
             Task.detached(priority: .userInitiated) {
                 do {
-                    let fileURL = try AuthorizedFolderStore.withSecurityScopedAccess(to: directoryURL) {
+                    let fileURL = try AuthorizedFolderStore.withSecurityScopedAccess(to: scopeURL) {
                         try FileCreator.createFile(template: template, in: directoryURL)
                     }
                     AppLogger.log(.info, "创建文件成功: \(fileURL.path)", category: "app")

@@ -84,6 +84,16 @@ enum AuthorizedFolderStore {
         return urls.contains { target.hasPrefix($0.standardizedFileURL.path) }
     }
 
+    static func nearestAuthorizedURL(for directoryURL: URL, from defaults: UserDefaults = .appGroup) -> URL? {
+        let urls = resolveFolderURLs(from: loadFolders(from: defaults))
+        guard !urls.isEmpty else {
+            return nil
+        }
+        let target = directoryURL.standardizedFileURL.path
+        let sorted = urls.sorted { $0.standardizedFileURL.path.count > $1.standardizedFileURL.path.count }
+        return sorted.first { target.hasPrefix($0.standardizedFileURL.path) }
+    }
+
     static func withSecurityScopedAccess<T>(to url: URL, _ action: () throws -> T) rethrows -> T {
         let success = url.startAccessingSecurityScopedResource()
         defer {
