@@ -11,6 +11,7 @@ struct MessagePayload: Codable {
     var menuConfig: MenuConfig?
     var favoriteFolders: [FavoriteFolder]?
     var favoriteApps: [FavoriteApp]?
+    var appBundleID: String?
     var level: String?
     var category: String?
     var message: String?
@@ -26,6 +27,7 @@ struct MessagePayload: Codable {
          menuConfig: MenuConfig? = nil,
          favoriteFolders: [FavoriteFolder]? = nil,
          favoriteApps: [FavoriteApp]? = nil,
+         appBundleID: String? = nil,
          level: String? = nil,
          category: String? = nil,
          message: String? = nil,
@@ -40,6 +42,7 @@ struct MessagePayload: Codable {
         self.menuConfig = menuConfig
         self.favoriteFolders = favoriteFolders
         self.favoriteApps = favoriteApps
+        self.appBundleID = appBundleID
         self.level = level
         self.category = category
         self.message = message

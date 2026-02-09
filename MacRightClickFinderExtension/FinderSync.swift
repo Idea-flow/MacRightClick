@@ -5,6 +5,8 @@ import CoreGraphics
 final class FinderSync: FIFinderSync {
     private var templates: [FileTemplate] = []
     private var templateIDsByTag: [Int: UUID] = [:]
+    private var favoriteFolderByTag: [Int: FavoriteFolder] = [:]
+    private var favoriteAppByTag: [Int: FavoriteApp] = [:]
     private var menuConfig: MenuConfig = .default
     private var favoriteFolders: [FavoriteFolder] = []
     private var favoriteApps: [FavoriteApp] = []
@@ -29,11 +31,14 @@ final class FinderSync: FIFinderSync {
             case "update-favorites":
                 if let folders = payload.favoriteFolders {
                     self.favoriteFolders = folders
+                    let emptyCount = folders.filter { $0.path.isEmpty }.count
+                    AppLogger.log(.info, "常用目录已更新: \(folders.count) 个（空路径: \(emptyCount)）", category: "finder")
                 }
                 if let apps = payload.favoriteApps {
                     self.favoriteApps = apps
+                    let emptyCount = apps.filter { $0.path.isEmpty }.count
+                    AppLogger.log(.info, "常用 App 已更新: \(apps.count) 个（空路径: \(emptyCount)）", category: "finder")
                 }
-                AppLogger.log(.info, "常用列表已更新", category: "finder")
             default:
                 break
             }
@@ -155,11 +160,19 @@ private extension FinderSync {
         let submenu = NSMenu(title: "常用目录")
         submenu.autoenablesItems = false
 
+        favoriteFolderByTag.removeAll(keepingCapacity: true)
+        var tagCounter = 1
         for folder in favoriteFolders {
+            guard !folder.path.isEmpty else {
+                AppLogger.log(.warning, "常用目录路径为空，已跳过：\(folder.name)", category: "finder")
+                continue
+            }
             let item = NSMenuItem(title: folder.name, action: #selector(openFavoriteFolder(_:)), keyEquivalent: "")
             item.target = self
             item.toolTip = folder.path
-            item.representedObject = folder
+            item.tag = tagCounter
+            favoriteFolderByTag[tagCounter] = folder
+            tagCounter += 1
             submenu.addItem(item)
         }
 
@@ -172,11 +185,19 @@ private extension FinderSync {
         let submenu = NSMenu(title: "常用 App")
         submenu.autoenablesItems = false
 
+        favoriteAppByTag.removeAll(keepingCapacity: true)
+        var tagCounter = 1
         for app in favoriteApps {
+            guard !app.path.isEmpty else {
+                AppLogger.log(.warning, "常用 App 路径为空，已跳过：\(app.name)", category: "finder")
+                continue
+            }
             let item = NSMenuItem(title: app.name, action: #selector(openFavoriteApp(_:)), keyEquivalent: "")
             item.target = self
             item.toolTip = app.path
-            item.representedObject = app
+            item.tag = tagCounter
+            favoriteAppByTag[tagCounter] = app
+            tagCounter += 1
             submenu.addItem(item)
         }
 
@@ -225,7 +246,8 @@ private extension FinderSync {
     }
 
     @objc func openFavoriteFolder(_ sender: NSMenuItem) {
-        guard let folder = sender.representedObject as? FavoriteFolder else {
+        guard let folder = favoriteFolderByTag[sender.tag] else {
+            AppLogger.log(.warning, "打开目录失败：未找到对应条目（menuTitle: \(sender.title), tag: \(sender.tag)）", category: "finder")
             return
         }
         DistributedMessenger.shared.sendToApp(
@@ -235,13 +257,14 @@ private extension FinderSync {
     }
 
     @objc func openFavoriteApp(_ sender: NSMenuItem) {
-        guard let app = sender.representedObject as? FavoriteApp else {
+        guard let app = favoriteAppByTag[sender.tag] else {
+            AppLogger.log(.warning, "打开 App 失败：未找到对应条目（menuTitle: \(sender.title), tag: \(sender.tag)）", category: "finder")
             return
         }
         DistributedMessenger.shared.sendToApp(
-            MessagePayload(action: "open-favorite-app", target: app.path)
+            MessagePayload(action: "open-favorite-app", target: app.path, appBundleID: app.bundleIdentifier)
         )
-        AppLogger.log(.info, "已请求打开 App: \(app.path)", category: "finder")
+        AppLogger.log(.info, "已请求打开 App: path=\(app.path), bundleID=\(app.bundleIdentifier)", category: "finder")
     }
 
     func writePathsToPasteboard(_ paths: [String]) {

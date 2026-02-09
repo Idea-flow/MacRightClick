@@ -48,7 +48,32 @@ struct FavoriteAppsView: View {
     }
 
     private func reload() {
-        apps = FavoriteAppStore.load()
+        var loaded = FavoriteAppStore.load()
+        var updated: [FavoriteApp] = []
+        updated.reserveCapacity(loaded.count)
+        var repairedCount = 0
+        var removedCount = 0
+
+        for var app in loaded {
+            if app.path.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                if let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: app.bundleIdentifier) {
+                    app.path = url.path
+                    repairedCount += 1
+                    updated.append(app)
+                } else {
+                    removedCount += 1
+                }
+                continue
+            }
+            updated.append(app)
+        }
+
+        if repairedCount > 0 || removedCount > 0 {
+            AppLogger.log(.warning, "常用 App 路径修复: 修复 \(repairedCount) 个, 移除 \(removedCount) 个", category: "app")
+            FavoriteAppStore.save(updated)
+        }
+
+        apps = updated
         selection = []
     }
 
@@ -71,6 +96,10 @@ struct FavoriteAppsView: View {
             ?? bundle.object(forInfoDictionaryKey: "CFBundleName") as? String
             ?? url.deletingPathExtension().lastPathComponent
         let path = url.path
+        guard !path.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            AppLogger.log(.warning, "添加常用 App 失败：路径为空", category: "app")
+            return
+        }
         guard !apps.contains(where: { $0.bundleIdentifier == bundleID }) else {
             return
         }

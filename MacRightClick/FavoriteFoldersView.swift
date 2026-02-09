@@ -43,7 +43,16 @@ struct FavoriteFoldersView: View {
     }
 
     private func reload() {
-        folders = FavoriteFolderStore.load()
+        var loaded = FavoriteFolderStore.load()
+        // Drop entries with empty paths to avoid menus that cannot open anything.
+        let before = loaded.count
+        loaded.removeAll { $0.path.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+        let removed = before - loaded.count
+        if removed > 0 {
+            AppLogger.log(.warning, "常用目录存在空路径，已移除 \(removed) 个", category: "app")
+            FavoriteFolderStore.save(loaded)
+        }
+        folders = loaded
         selection = []
     }
 
@@ -58,6 +67,10 @@ struct FavoriteFoldersView: View {
             return
         }
         let path = url.path
+        guard !path.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            AppLogger.log(.warning, "添加常用目录失败：路径为空", category: "app")
+            return
+        }
         guard !folders.contains(where: { $0.path == path }) else {
             return
         }

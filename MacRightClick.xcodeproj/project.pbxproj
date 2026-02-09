@@ -13,6 +13,7 @@
 		1A9975288E46EBBBF1C57CE1 /* LogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05AE769DD42B7C417C5EB09F /* LogStore.swift */; };
 		23CE575E654F9D40883E792F /* FinderSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7206CC57FC1E452ECFEEB9 /* FinderSync.swift */; };
 		27E434F9DDD9200EE4787E81 /* DockVisibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCE6CDF6CC909BD740C84369 /* DockVisibility.swift */; };
+		31F1DC5D36A3D5E2BCCE653A /* FinderSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7206CC57FC1E452ECFEEB9 /* FinderSync.swift */; };
 		3300C73E263EEFD8F967A4AE /* FileCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B719FF09BB9BFFFCFBE5789E /* FileCreator.swift */; };
 		55C66EF8F2975627540BCFD7 /* FavoriteFolderStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1BA2C0F842113110D29DC7A /* FavoriteFolderStore.swift */; };
 		57194D372F3A217400E577A2 /* Messenger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62FE642907BFC078EB715517 /* Messenger.swift */; };
@@ -26,6 +27,7 @@
 		B42E3CB591EACD074A074453 /* LogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05AE769DD42B7C417C5EB09F /* LogStore.swift */; };
 		BA797FD6746F467ECB4798AD /* MenuConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40EBB6B04760A7D035E68D1B /* MenuConfigView.swift */; };
 		C977CD5318DB3497DE899A56 /* LogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A997B5EA222547C1A612C9E6 /* LogView.swift */; };
+		CFE2F2179561313BC7C22E34 /* FinderSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7206CC57FC1E452ECFEEB9 /* FinderSync.swift */; };
 		D99EB5DCF15D94C007EF0AEA /* MenuConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8ED63C76E9AE29FA9AC531 /* MenuConfig.swift */; };
 		DE1BCD2FC33AC6376ED518B5 /* AuthorizedFolderStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 089CC7ADC531646B79FD1F93 /* AuthorizedFolderStore.swift */; };
 		F15CFF46E89ECB17BA5812AB /* Messenger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62FE642907BFC078EB715517 /* Messenger.swift */; };
@@ -295,6 +297,8 @@
 				05C4C0732BC72FF9CF494255 /* FavoriteAppsView.swift in Sources */,
 				55C66EF8F2975627540BCFD7 /* FavoriteFolderStore.swift in Sources */,
 				095A8DC9257514774A6893D9 /* FavoriteAppStore.swift in Sources */,
+				CFE2F2179561313BC7C22E34 /* FinderSync.swift in Sources */,
+				31F1DC5D36A3D5E2BCCE653A /* FinderSync.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
