@@ -19,6 +19,8 @@ struct ContentView: View {
                 LogView()
             case .authorizedFolders:
                 AuthorizedFoldersView()
+            case .settings:
+                SettingsView()
             }
         }
         .frame(minWidth: 860, minHeight: 520)
@@ -45,6 +47,7 @@ private enum SidebarItem: String, Hashable, CaseIterable, Identifiable {
     case templates
     case logs
     case authorizedFolders
+    case settings
 
     var id: String { rawValue }
 }
@@ -61,6 +64,8 @@ private struct SidebarView: View {
                     .tag(SidebarItem.logs)
                 Label("授权目录", systemImage: "folder.badge.plus")
                     .tag(SidebarItem.authorizedFolders)
+                Label("设置", systemImage: "gearshape")
+                    .tag(SidebarItem.settings)
             }
         }
         .listStyle(.sidebar)

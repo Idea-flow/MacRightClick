@@ -1,17 +1,13 @@
 import SwiftUI
 import AppKit
-import FinderSync
 
 struct AuthorizedFoldersView: View {
     @State private var folders: [AuthorizedFolder] = AuthorizedFolderStore.loadFolders()
     @State private var selection: Set<UUID> = []
     @State private var errorMessage: String?
-    @State private var extensionEnabled = false
-    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         VStack(spacing: 0) {
-            extensionSection
             if let errorMessage {
                 Text(errorMessage)
                     .foregroundStyle(.red)
@@ -44,47 +40,12 @@ struct AuthorizedFoldersView: View {
                 Button("刷新", action: reload)
             }
         }
-        .onAppear {
-            reload()
-            updateExtensionState()
-        }
-        .onChange(of: scenePhase) { _, newPhase in
-            guard newPhase == .active else { return }
-            updateExtensionState()
-        }
-    }
-
-    private var extensionSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Text("Finder 扩展")
-                    .font(.headline)
-                Spacer()
-                Button(action: openExtensionSettings) {
-                    Label("打开设置", systemImage: extensionEnabled ? "checkmark.circle.fill" : "checkmark.circle")
-                }
-            }
-            Text("必须在系统设置里启用 Finder 扩展，右键菜单才能生效。")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-        }
-        .padding()
-        .background(.thinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-        .padding([.horizontal, .top])
+        .onAppear(perform: reload)
     }
 
     private func reload() {
         folders = AuthorizedFolderStore.loadFolders()
         selection = []
-    }
-
-    private func updateExtensionState() {
-        extensionEnabled = FIFinderSyncController.isExtensionEnabled
-    }
-
-    private func openExtensionSettings() {
-        FIFinderSyncController.showExtensionManagementInterface()
     }
 
     private func addFolder() {

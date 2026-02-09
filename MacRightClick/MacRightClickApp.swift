@@ -2,17 +2,29 @@ import SwiftUI
 
 @main
 struct MacRightClickApp: App {
+    @AppStorage("ShowMenuBar", store: .appGroup) private var showMenuBar = true
+    @AppStorage("ShowDockIcon", store: .appGroup) private var showDockIcon = true
+
     init() {
         _ = LogStore.shared
         setupExtensionCommunication()
         sendScopeUpdate()
         sendTemplatesUpdate()
+        DispatchQueue.main.async {
+            DockVisibility.apply(showDockIcon: UserDefaults.appGroup.object(forKey: "ShowDockIcon") as? Bool ?? true)
+        }
         AppLogger.log(.info, "App 启动", category: "app")
     }
 
     var body: some Scene {
-        WindowGroup {
+        WindowGroup("右键助手", id: "main") {
             ContentView()
+        }
+        Settings {
+            SettingsView()
+        }
+        MenuBarExtra("右键助手", image: "MenuBarIcon", isInserted: $showMenuBar) {
+            MenuBarContentView()
         }
     }
 
@@ -64,5 +76,20 @@ struct MacRightClickApp: App {
     private func sendTemplatesUpdate() {
         let enabled = TemplateStore.enabledTemplates()
         DistributedMessenger.shared.sendToExtension(MessagePayload(action: "update-templates", templates: enabled))
+    }
+}
+
+private struct MenuBarContentView: View {
+    @Environment(\.openWindow) private var openWindow
+
+    var body: some View {
+        Button("打开主程序") {
+            openWindow(id: "main")
+            NSApp.activate(ignoringOtherApps: true)
+        }
+        Divider()
+        Button("退出") {
+            NSApp.terminate(nil)
+        }
     }
 }
