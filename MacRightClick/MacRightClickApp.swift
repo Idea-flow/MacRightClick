@@ -238,13 +238,57 @@ struct MacRightClickApp: App {
     }
 
     private func openTerminal(at path: String) {
+        let trimmedPath = path.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedPath.isEmpty else {
+            AppLogger.log(.warning, "打开终端失败：路径为空", category: "app")
+            return
+        }
+        AppLogger.log(.info, "准备打开终端: \(trimmedPath)", category: "app")
+        let directoryURL = URL(fileURLWithPath: trimmedPath, isDirectory: true)
+        guard FileManager.default.fileExists(atPath: directoryURL.path) else {
+            AppLogger.log(.error, "打开终端失败：路径不存在 \(directoryURL.path)", category: "app")
+            return
+        }
+
+        Task {
+            guard let scopeURL = await ensureAuthorizedScope(for: directoryURL, mode: .guide) else {
+                AppLogger.log(.warning, "打开终端失败：目录未授权 \(directoryURL.path)", category: "authorization")
+                return
+            }
+            do {
+                try AuthorizedFolderStore.withSecurityScopedAccess(to: scopeURL) {
+                    openTerminalWithWorkspace(directoryURL: directoryURL)
+                }
+            } catch {
+                AppLogger.log(.error, "打开终端失败: \(directoryURL.path) \(error.localizedDescription)", category: "app")
+            }
+        }
+    }
+
+    private func openTerminalWithWorkspace(directoryURL: URL) {
+        if let terminalURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: "com.apple.Terminal") {
+            let config = NSWorkspace.OpenConfiguration()
+            NSWorkspace.shared.open([directoryURL], withApplicationAt: terminalURL, configuration: config) { _, error in
+                if let error {
+                    AppLogger.log(.error, "打开终端失败: \(directoryURL.path) \(error.localizedDescription)", category: "app")
+                    AppLogger.log(.error, "Terminal URL: \(terminalURL.path)", category: "app")
+                } else {
+                    AppLogger.log(.info, "已请求打开终端: \(directoryURL.path)", category: "app")
+                }
+            }
+            return
+        }
+
+        // 备用方案：/usr/bin/open
         let process = Process()
-        process.launchPath = "/usr/bin/open"
-        process.arguments = ["-a", "Terminal", path]
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/open")
+        process.arguments = ["-a", "Terminal", directoryURL.path]
         do {
             try process.run()
+            AppLogger.log(.info, "已请求打开终端(备用): \(directoryURL.path)", category: "app")
         } catch {
-            AppLogger.log(.error, "打开终端失败: \(path) \(error.localizedDescription)", category: "app")
+            AppLogger.log(.error, "打开终端失败(备用): \(directoryURL.path) \(error.localizedDescription)", category: "app")
+            AppLogger.log(.error, "备用命令: /usr/bin/open -a Terminal \(directoryURL.path)", category: "app")
         }
     }
 
@@ -302,9 +346,28 @@ struct MacRightClickApp: App {
         AppLogger.log(.info, "移动完成：成功 \(successCount) 个，失败 \(failureCount) 个", category: "move")
     }
 
-    private func ensureAuthorizedScope(for directoryURL: URL) async -> URL? {
+    private enum AuthorizationPromptMode {
+        case panel
+        case guide
+    }
+
+    @MainActor
+    private func openAuthorizedFoldersPage() {
+        NSApp.activate(ignoringOtherApps: true)
+        NSApp.windows.first?.makeKeyAndOrderFront(nil)
+        NotificationCenter.default.post(name: AppNotifications.openAuthorizedFolders, object: nil)
+    }
+
+    private func ensureAuthorizedScope(for directoryURL: URL, mode: AuthorizationPromptMode = .panel) async -> URL? {
         if let scope = AuthorizedFolderStore.nearestAuthorizedURL(for: directoryURL) {
             return scope
+        }
+
+        if mode == .guide {
+            await MainActor.run {
+                openAuthorizedFoldersPage()
+            }
+            return nil
         }
 
         // 未授权时允许弹窗一次，引导用户选择目录并保存安全书签。

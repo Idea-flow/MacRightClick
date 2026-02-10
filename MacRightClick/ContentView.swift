@@ -2,6 +2,10 @@ import SwiftUI
 import Observation
 import FinderSync
 
+enum AppNotifications {
+    static let openAuthorizedFolders = Notification.Name("OpenAuthorizedFolders")
+}
+
 struct ContentView: View {
     @State private var store = TemplateStore()
     @State private var selection: SidebarItem = .templates
@@ -44,6 +48,9 @@ struct ContentView: View {
                 showEnableExtensionAlert = true
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: AppNotifications.openAuthorizedFolders)) { _ in
+            selection = .authorizedFolders
+        }
         .alert("启用 Finder 扩展", isPresented: $showEnableExtensionAlert) {
             Button("打开设置") {
                 FIFinderSyncController.showExtensionManagementInterface()
@@ -76,7 +83,9 @@ private struct SidebarView: View {
     var body: some View {
         List(selection: $selection) {
             Section("功能") {
-                Label("模板", systemImage: "doc.text")
+                Label("授权目录", systemImage: "folder.badge.plus")
+                     .tag(SidebarItem.authorizedFolders)
+                Label("文件模板", systemImage: "doc.text")
                     .tag(SidebarItem.templates)
                 Label("菜单配置", systemImage: "slider.horizontal.3")
                     .tag(SidebarItem.menuConfig)
@@ -86,8 +95,6 @@ private struct SidebarView: View {
                     .tag(SidebarItem.favoriteApps)
                 Label("日志", systemImage: "text.justify")
                     .tag(SidebarItem.logs)
-                Label("授权目录", systemImage: "folder.badge.plus")
-                    .tag(SidebarItem.authorizedFolders)
                 Label("设置", systemImage: "gearshape")
                     .tag(SidebarItem.settings)
             }
