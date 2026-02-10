@@ -129,10 +129,15 @@ private extension FinderSync {
         case secondary
     }
 
+    /// 设置菜单项图标（SF Symbols），并按层级色渲染以贴近系统菜单风格。
+    /// - Parameters:
+    ///   - symbol: SF Symbols 名称
+    ///   - item: 需要设置图标的菜单项
+    ///   - level: 主/次层级（影响颜色强度）
     func applyIcon(symbol: String, to item: NSMenuItem, level: MenuIconLevel = .primary) {
-        guard menuConfig.showIcons else { return }
-        guard let base = NSImage(systemSymbolName: symbol, accessibilityDescription: symbol) else { return }
-        let color: NSColor = {
+        guard menuConfig.showIcons else { return } // 用户关闭图标时不渲染
+        guard let base = NSImage(systemSymbolName: symbol, accessibilityDescription: symbol) else { return } // SF Symbol 生成失败直接跳过
+        let color: NSColor = { // 主/次层级分别使用强调色/次级色
             switch level {
             case .primary:
                 return NSColor.controlAccentColor
@@ -142,38 +147,41 @@ private extension FinderSync {
         }()
         if #available(macOS 13.0, *),
            let configured = base.withSymbolConfiguration(.init(hierarchicalColor: color)) {
-            configured.isTemplate = false
+            configured.isTemplate = false // 层级色已渲染，避免再被系统二次着色
             item.image = configured
         } else {
-            // Fallback: template monochrome (system will tint automatically)
+            // 旧系统回退：模板图标，由系统菜单自行着色
             base.isTemplate = true
             base.size = NSSize(width: 16, height: 16)
             item.image = base
         }
     }
 
+    /// 设置“常用 App”菜单图标，优先使用应用自身图标（彩色）。
+    /// 当应用路径无效时回退为通用 App 图标。
     func applyAppIcon(path: String, to item: NSMenuItem) {
-        guard menuConfig.showIcons else { return }
-        guard FileManager.default.fileExists(atPath: path) else {
+        guard menuConfig.showIcons else { return } // 用户关闭图标时不渲染
+        guard FileManager.default.fileExists(atPath: path) else { // 路径无效时回退
             applyIcon(symbol: "app", to: item, level: .secondary)
             return
         }
-        let image = NSWorkspace.shared.icon(forFile: path)
-        image.size = NSSize(width: 16, height: 16)
-        // Keep original app icon colors.
-        image.isTemplate = false
+        let image = NSWorkspace.shared.icon(forFile: path) // 系统读取应用图标
+        image.size = NSSize(width: 16, height: 16) // 统一尺寸
+        image.isTemplate = false // 保持原色
         item.image = image
     }
 
+    /// 设置“新建文件”子菜单图标，与主程序模板列表保持一致。
+    /// 使用 UTType 获取系统文件类型图标；无法识别则回退为扩展名图标。
     func applyFileTypeIcon(for template: FileTemplate, to item: NSMenuItem) {
-        guard menuConfig.showIcons else { return }
-        let ext = template.kind.iconFileExtension
-        if let utType = UTType(filenameExtension: ext) {
+        guard menuConfig.showIcons else { return } // 用户关闭图标时不渲染
+        let ext = template.kind.iconFileExtension // 统一扩展名来源
+        if let utType = UTType(filenameExtension: ext) { // 优先走 UTType
             item.image = NSWorkspace.shared.icon(forFileType: utType.identifier)
         } else {
-            item.image = NSWorkspace.shared.icon(forFileType: ext)
+            item.image = NSWorkspace.shared.icon(forFileType: ext) // 回退：直接用扩展名
         }
-        item.image?.size = NSSize(width: 16, height: 16)
+        item.image?.size = NSSize(width: 16, height: 16) // 统一尺寸
     }
 
 
@@ -183,7 +191,7 @@ private extension FinderSync {
             return
         }
         let parentItem = NSMenuItem(title: "新建文件", action: nil, keyEquivalent: "")
-        applyIcon(symbol: "doc.badge.plus", to: parentItem)
+        applyIcon(symbol: "doc.badge.plus", to: parentItem) // 主菜单图标
         let submenu = NSMenu(title: "新建文件")
         submenu.autoenablesItems = false
 
@@ -196,7 +204,7 @@ private extension FinderSync {
             item.tag = tagCounter
             templateIDsByTag[tagCounter] = template.id
             tagCounter += 1
-            applyFileTypeIcon(for: template, to: item)
+            applyFileTypeIcon(for: template, to: item) // 子菜单使用文件类型图标
             submenu.addItem(item)
         }
 

@@ -12,6 +12,7 @@ enum TemplateKind: String, Codable, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
+    /// 用于获取系统文件类型图标的扩展名（右键菜单与主程序保持一致）
     var iconFileExtension: String {
         switch self {
         case .text:
@@ -151,6 +152,7 @@ struct FileTemplate: Identifiable, Hashable, Codable {
     }
 
     static var defaults: [FileTemplate] {
+        // 默认模板集合：文本/Markdown/PDF/Office 三件套/JSON
         let kinds: [TemplateKind] = [.text, .markdown, .pdf, .docx, .xlsx, .pptx, .json]
         return kinds.map { kind in
             FileTemplate(
