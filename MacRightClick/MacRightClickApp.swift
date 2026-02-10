@@ -169,16 +169,31 @@ struct MacRightClickApp: App {
     }
 
     private func openFolder(at path: String) {
-        guard !path.isEmpty else {
+        let trimmedPath = path.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedPath.isEmpty else {
             AppLogger.log(.warning, "打开目录失败：路径为空", category: "app")
             return
         }
-        let url = URL(fileURLWithPath: path, isDirectory: true)
+        let url = URL(fileURLWithPath: trimmedPath, isDirectory: true)
         guard FileManager.default.fileExists(atPath: url.path) else {
             AppLogger.log(.error, "打开目录失败：路径不存在 \(url.path)", category: "app")
             return
         }
-        NSWorkspace.shared.open(url)
+
+        Task {
+            guard let scopeURL = await ensureAuthorizedScope(for: url) else {
+                AppLogger.log(.warning, "打开目录失败：未授权 \(url.path)", category: "authorization")
+                return
+            }
+            do {
+                try AuthorizedFolderStore.withSecurityScopedAccess(to: scopeURL) {
+                    NSWorkspace.shared.open(url)
+                }
+                AppLogger.log(.info, "打开目录成功: \(url.path)", category: "app")
+            } catch {
+                AppLogger.log(.error, "打开目录失败: \(url.path) \(error.localizedDescription)", category: "app")
+            }
+        }
     }
 
     private func openApp(at path: String, bundleID: String?) {
