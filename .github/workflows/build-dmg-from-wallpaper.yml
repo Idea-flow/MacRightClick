@@ -1,0 +1,199 @@
+name: Build DMG
+
+permissions:
+  contents: write
+
+on:
+  push:
+    branches: [ "main-test" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    env:
+      APP_NAME: "MacRightClick"
+      APP_VERSION: "0.1.0"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Build Release App
+        run: |
+          # 禁用代码签名以避免 CI 中缺少签名证书导致构建失败。
+          # 如果你需要生产签名（发布到 App Store 或有签名需求），请参考下方说明并在 workflow 中安装证书与 provisioning profile。
+          xcodebuild \
+            -project MacRightClick.xcodeproj \
+            -scheme MacRightClick \
+            -configuration Release \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            clean build
+
+      - name: Create DMG
+        run: |
+          APP_NAME="MacRightClick"
+          APP_VERSION="${{ env.APP_VERSION }}"
+          APP_PATH="build/Build/Products/Release/${APP_NAME}.app"
+          if [ ! -d "$APP_PATH" ]; then
+            echo "App not found at $APP_PATH"
+            exit 1
+          fi
+
+          # Prepare a temporary read-write image
+          DMG_TMP="${APP_NAME}-temp.dmg"
+          SIZE="120m"
+          EMPTY_DIR=$(mktemp -d)
+          hdiutil create -srcfolder "$EMPTY_DIR" -size "$SIZE" -fs HFS+ -volname "$APP_NAME" -ov -format UDRW "$DMG_TMP"
+          rm -rf "$EMPTY_DIR"
+
+          # Attach the image and get mount point
+          MOUNT_POINT=$(hdiutil attach -readwrite -noverify -noautoopen "$DMG_TMP" | egrep '/Volumes/' | sed -E 's/.*\t(\/Volumes\/.*)/\1/' | head -n1)
+          if [ -z "$MOUNT_POINT" ]; then
+            echo "Failed to attach temporary image"
+            exit 1
+          fi
+
+          # Copy the app into the mounted image
+          cp -R "$APP_PATH" "$MOUNT_POINT/"
+
+          # Ensure file system updates are flushed and allow Finder a moment to register items
+          sync
+          sleep 1
+
+          # Fallback: create a symbolic link to /Applications so there's an item even when AppleScript cannot run in CI
+          if [ ! -e "$MOUNT_POINT/Applications" ]; then
+            ln -s /Applications "$MOUNT_POINT/Applications" || true
+          fi
+
+          # Create a README with installation instructions instead of executable script (avoids Gatekeeper prompts)
+          cat > "$MOUNT_POINT/README.txt" <<'README'
+          安装说明
+
+          1) 将 "MacRightClick.app" 拖到 /Applications 文件夹完成安装。
+
+          2) 如果应用无法打开，请在“终端”中运行下面的命令以清除 macOS 隔离（quarantine）标记：
+
+          xattr -cr '/Applications/MacRightClick.app'
+
+          注意：如果出现权限问题，请在终端中使用 sudo：
+
+          sudo xattr -cr '/Applications/MacRightClick.app'
+
+
+          README
+
+          # Try to arrange icons (MacRightClick.app left, Applications right, README center) via AppleScript -- non-fatal
+          osascript <<'AS' || true
+          tell application "Finder"
+            try
+              tell disk "$APP_NAME"
+                open
+                delay 0.5
+                set current view of container window to icon view
+                set toolbar visible of container window to false
+                set statusbar visible of container window to false
+                set the bounds of container window to {120, 120, 820, 480}
+                set viewOptions to the icon view options of container window
+                set arrangement of viewOptions to not arranged
+                set icon size of viewOptions to 128
+
+                -- wait for items to appear (max ~5 seconds)
+                set maxAttempts to 12
+                set foundApp to false
+                set foundReadme to false
+                set foundAppsAlias to false
+                repeat with i from 1 to maxAttempts
+                  try
+                    if (exists item ("${APP_NAME}.app") of container window) then set foundApp to true
+                  end try
+                  try
+                    if (exists item "README.txt" of container window) then set foundReadme to true
+                  end try
+                  try
+                    if (exists item "Applications" of container window) then set foundAppsAlias to true
+                  end try
+                  try
+                    if (exists item "应用程序" of container window) then set foundAppsAlias to true
+                  end try
+                  if foundApp and foundReadme and foundAppsAlias then exit repeat
+                  delay 0.5
+                end repeat
+
+                -- position app: left (natural drag direction)
+                set appPos to {140, 200}
+                set readmePos to {360, 200}
+                set appsPos to {580, 200}
+
+                set app_candidates to {"${APP_NAME}.app", "${APP_NAME}"}
+                repeat with nm in app_candidates
+                  try
+                    if (exists item nm of container window) then
+                      set position of item nm of container window to appPos
+                      exit repeat
+                    end if
+                  end try
+                end repeat
+
+                -- README center
+                try
+                  if (exists item "README.txt" of container window) then
+                    set position of item "README.txt" of container window to readmePos
+                  end if
+                end try
+
+                -- Applications on right: try common localized names
+                set apps_candidates to {"Applications", "应用程序"}
+                repeat with anm in apps_candidates
+                  try
+                    if (exists item anm of container window) then
+                      set position of item anm of container window to appsPos
+                      exit repeat
+                    end if
+                  end try
+                end repeat
+
+                -- quick refresh so Finder shows the arranged layout naturally
+                delay 0.3
+                close
+                delay 0.2
+                open
+                update without registering applications
+              end tell
+            end try
+          end tell
+          AS
+
+          # Detach and convert to compressed DMG
+          FINAL_DMG="${APP_NAME}-${APP_VERSION}.dmg"
+          hdiutil detach "$MOUNT_POINT"
+          hdiutil convert "$DMG_TMP" -format UDZO -imagekey zlib-level=9 -o "$FINAL_DMG"
+          rm -f "$DMG_TMP"
+
+          echo "Created ${FINAL_DMG}"
+
+      - name: Create GitHub Release and upload asset
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: "v${{ env.APP_VERSION }}"
+          name: "${{ env.APP_NAME }} ${{ env.APP_VERSION }}"
+          body: "Automated release for ${{ env.APP_NAME }} v${{ env.APP_VERSION }} (artifact ${{ env.APP_NAME }}-${{ env.APP_VERSION }}.dmg)"
+          files: ${{ env.APP_NAME }}-${{ env.APP_VERSION }}.dmg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Print Release asset download URL
+        run: |
+          echo "Release 页面: https://github.com/${{ github.repository }}/releases/tag/v${{ env.APP_VERSION }}"
+          echo "Release 标签: v${{ env.APP_VERSION }}"
+          echo "资产浏览下载 URL: https://github.com/${{ github.repository }}/releases/download/v${{ env.APP_VERSION }}/${{ env.APP_NAME }}-${{ env.APP_VERSION }}.dmg"
+          echo "在浏览器中打开上述 URL 可直接下载；若使用 curl，可运行："
+          echo "curl -L -o ${{ env.APP_NAME }}-${{ env.APP_VERSION }}.dmg \"https://github.com/${{ github.repository }}/releases/download/v${{ env.APP_VERSION }}/${{ env.APP_NAME }}-${{ env.APP_VERSION }}.dmg\""
