@@ -13,10 +13,21 @@ struct MacRightClickApp: App {
         sendTemplatesUpdate()
         sendMenuConfigUpdate()
         sendFavoritesUpdate()
+        sendAppRunning()
         DispatchQueue.main.async {
             DockVisibility.apply(showDockIcon: UserDefaults.appGroup.object(forKey: "ShowDockIcon") as? Bool ?? true)
         }
         AppLogger.log(.info, "App 启动", category: "app")
+
+        // Ensure quit notification is sent when the app terminates.
+        NotificationCenter.default.addObserver(
+            forName: NSApplication.willTerminateNotification,
+            object: nil,
+            queue: .main
+        ) { _ in
+            AppLogger.log(.info, "发送主程序退出通知", category: "app")
+            DistributedMessenger.shared.sendToExtension(MessagePayload(action: "app-quit"))
+        }
     }
 
     var body: some Scene {
@@ -145,6 +156,16 @@ struct MacRightClickApp: App {
         DistributedMessenger.shared.sendToExtension(
             MessagePayload(action: "update-favorites", favoriteFolders: enabledFolders, favoriteApps: enabledApps)
         )
+    }
+
+    private func sendAppRunning() {
+        AppLogger.log(.info, "发送主程序启动通知", category: "app")
+        DistributedMessenger.shared.sendToExtension(MessagePayload(action: "app-running"))
+    }
+
+    private func sendAppQuit() {
+        AppLogger.log(.info, "发送主程序退出通知", category: "app")
+        DistributedMessenger.shared.sendToExtension(MessagePayload(action: "app-quit"))
     }
 
     private func openFolder(at path: String) {

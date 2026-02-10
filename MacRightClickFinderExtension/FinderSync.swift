@@ -11,6 +11,7 @@ final class FinderSync: FIFinderSync {
     private var menuConfig: MenuConfig = .default
     private var favoriteFolders: [FavoriteFolder] = []
     private var favoriteApps: [FavoriteApp] = []
+    private var isHostAppOpen = false
 
     override init() {
         super.init()
@@ -40,6 +41,12 @@ final class FinderSync: FIFinderSync {
                     let emptyCount = apps.filter { $0.path.isEmpty }.count
                     AppLogger.log(.info, "常用 App 已更新: \(apps.count) 个（空路径: \(emptyCount)）", category: "finder")
                 }
+            case "app-running":
+                self.isHostAppOpen = true
+//                AppLogger.log(.info, "主程序已启动，扩展恢复可用", category: "finder")
+            case "app-quit":
+                self.isHostAppOpen = false
+//                AppLogger.log(.info, "主程序已退出，扩展禁用菜单", category: "finder")
             default:
                 break
             }
@@ -49,6 +56,11 @@ final class FinderSync: FIFinderSync {
 
     override func menu(for menuKind: FIMenuKind) -> NSMenu? {
         guard menuKind == .contextualMenuForContainer || menuKind == .contextualMenuForItems else {
+            return nil
+        }
+
+        // 主程序不在线时，不提供任何菜单项。
+        guard isHostAppOpen else {
             return nil
         }
 
