@@ -35,6 +35,9 @@ enum FileCreator {
         case .pdf:
             let data = PDFBuilder.makeBlankPDF(title: template.defaultBaseName)
             try data.write(to: url, options: .atomic)
+        case .docx, .xlsx, .pptx:
+            // Office formats are zip-based; create an empty placeholder file.
+            try Data().write(to: url, options: .atomic)
         }
     }
 }

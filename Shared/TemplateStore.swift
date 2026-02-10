@@ -47,7 +47,18 @@ final class TemplateStore {
         }
         do {
             let decoded = try JSONDecoder().decode([FileTemplate].self, from: data)
-            return decoded.isEmpty ? FileTemplate.defaults : decoded
+            if decoded.isEmpty {
+                return FileTemplate.defaults
+            }
+            // Merge newly added default templates into existing stored list.
+            let existingKinds = Set(decoded.map { $0.kind })
+            let missingDefaults = FileTemplate.defaults.filter { !existingKinds.contains($0.kind) }
+            if missingDefaults.isEmpty {
+                return decoded
+            }
+            let merged = decoded + missingDefaults
+            storeTemplates(merged, to: defaults, storageKey: storageKey)
+            return merged
         } catch {
             return FileTemplate.defaults
         }

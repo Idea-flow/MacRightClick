@@ -5,6 +5,9 @@ enum TemplateKind: String, Codable, CaseIterable, Identifiable {
     case markdown
     case pdf
     case json
+    case docx
+    case xlsx
+    case pptx
     case custom
 
     var id: String { rawValue }
@@ -19,6 +22,12 @@ enum TemplateKind: String, Codable, CaseIterable, Identifiable {
             return "PDF"
         case .json:
             return "JSON"
+        case .docx:
+            return "Word"
+        case .xlsx:
+            return "Excel"
+        case .pptx:
+            return "PowerPoint"
         case .custom:
             return "自定义"
         }
@@ -34,6 +43,12 @@ enum TemplateKind: String, Codable, CaseIterable, Identifiable {
             return "pdf"
         case .json:
             return "json"
+        case .docx:
+            return "docx"
+        case .xlsx:
+            return "xlsx"
+        case .pptx:
+            return "pptx"
         case .custom:
             return "txt"
         }
@@ -43,7 +58,7 @@ enum TemplateKind: String, Codable, CaseIterable, Identifiable {
         switch self {
         case .text, .markdown, .json, .custom:
             return true
-        case .pdf:
+        case .pdf, .docx, .xlsx, .pptx:
             return false
         }
     }
@@ -58,6 +73,12 @@ enum TemplateKind: String, Codable, CaseIterable, Identifiable {
             return "新建PDF"
         case .json:
             return "新建JSON"
+        case .docx:
+            return "新建文档"
+        case .xlsx:
+            return "新建表格"
+        case .pptx:
+            return "新建演示"
         case .custom:
             return "新建文件"
         }
@@ -73,6 +94,8 @@ enum TemplateKind: String, Codable, CaseIterable, Identifiable {
             return ""
         case .json:
             return "{\n  \n}"
+        case .docx, .xlsx, .pptx:
+            return ""
         case .custom:
             return ""
         }
@@ -107,7 +130,7 @@ struct FileTemplate: Identifiable, Hashable, Codable {
     }
 
     static var defaults: [FileTemplate] {
-        let kinds: [TemplateKind] = [.text, .markdown, .pdf, .json]
+        let kinds: [TemplateKind] = [.text, .markdown, .pdf, .docx, .xlsx, .pptx, .json]
         return kinds.map { kind in
             FileTemplate(
                 kind: kind,

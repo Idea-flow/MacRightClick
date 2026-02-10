@@ -1,6 +1,8 @@
 import SwiftUI
 import Observation
 import FinderSync
+import AppKit
+import UniformTypeIdentifiers
 
 enum AppNotifications {
     static let openAuthorizedFolders = Notification.Name("OpenAuthorizedFolders")
@@ -149,8 +151,9 @@ private struct TemplateListRow: View {
 
     var body: some View {
         HStack(spacing: 10) {
-            Image(systemName: template.isEnabled ? "checkmark.circle.fill" : "circle")
-                .foregroundStyle(template.isEnabled ? Color.accentColor : .secondary)
+            Image(nsImage: iconForTemplate(template))
+                .resizable()
+                .frame(width: 18, height: 18)
             VStack(alignment: .leading, spacing: 4) {
                 Text(template.displayName)
                 Text(".\(template.fileExtension)")
@@ -159,6 +162,14 @@ private struct TemplateListRow: View {
             }
         }
         .tag(template.id)
+    }
+
+    private func iconForTemplate(_ template: FileTemplate) -> NSImage {
+        let ext = template.fileExtension.lowercased()
+        if let utType = UTType(filenameExtension: ext) {
+            return NSWorkspace.shared.icon(forFileType: utType.identifier)
+        }
+        return NSWorkspace.shared.icon(forFileType: ext)
     }
 }
 
