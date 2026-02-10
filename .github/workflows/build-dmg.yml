@@ -10,7 +10,7 @@ on:
 
 jobs:
   build-dmg:
-    runs-on: macos-latest
+    runs-on: macos-15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -19,6 +19,8 @@ jobs:
         id: version
         run: |
           set -euo pipefail
+          xcodebuild -version
+          sw_vers
           SETTINGS=$(xcodebuild -showBuildSettings -project MacRightClick.xcodeproj -scheme MacRightClick)
           VERSION=$(echo "$SETTINGS" | awk -F' = ' '/MARKETING_VERSION/ {print $2; exit}')
           BUILD=$(echo "$SETTINGS" | awk -F' = ' '/CURRENT_PROJECT_VERSION/ {print $2; exit}')
@@ -32,6 +34,7 @@ jobs:
       - name: Build Archive
         run: |
           set -euo pipefail
+          sudo xcode-select -s /Applications/Xcode_26.2.app
           xcodebuild \
             -project MacRightClick.xcodeproj \
             -scheme MacRightClick \
