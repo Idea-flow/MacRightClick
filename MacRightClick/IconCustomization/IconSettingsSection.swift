@@ -5,8 +5,6 @@ import UniformTypeIdentifiers
 /// Settings UI for custom dock and menu bar icons.
 struct IconSettingsSection: View {
     @Environment(AppIconManager.self) private var iconManager
-    @State private var showDockPicker = false
-    @State private var showMenuBarPicker = false
 
     private var allowedTypes: [UTType] {
         var types: [UTType] = [.image]
@@ -24,7 +22,7 @@ struct IconSettingsSection: View {
                     previewImage: iconManager.dockPreviewImage(),
                     path: iconManager.dockIconPath,
                     previewSize: 48,
-                    pickAction: { showDockPicker = true },
+                    pickAction: { presentOpenPanel(for: .dock) },
                     resetAction: iconManager.clearDockIcon
                 )
 
@@ -35,7 +33,7 @@ struct IconSettingsSection: View {
                     previewImage: iconManager.menuBarPreviewImage(),
                     path: iconManager.menuBarIconPath,
                     previewSize: 24,
-                    pickAction: { showMenuBarPicker = true },
+                    pickAction: { presentOpenPanel(for: .menuBar) },
                     resetAction: iconManager.clearMenuBarIcon
                 )
 
@@ -49,39 +47,11 @@ struct IconSettingsSection: View {
                 .help("模板图会自动适配浅色/深色菜单栏")
                 .disabled(iconManager.menuBarIconPath == nil)
 
-                Text("支持常见图片格式（PNG/JPG/ICNS）。Dock 图标建议 512×512 或 1024×1024。菜单栏图标建议 18×18 或 36×36。")
+                Text("支持常见图片格式（PNG/JPG/ICNS）。Dock 图标建议 512×512 或 1024×1024，系统会裁剪为椭圆并限制在 256~4096 像素范围内。菜单栏图标建议 18×18 或 36×36，系统将限制在 12~256 像素范围内。")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             }
             .padding(.vertical, 4)
-        }
-        .fileImporter(
-            isPresented: $showDockPicker,
-            allowedContentTypes: allowedTypes,
-            allowsMultipleSelection: false
-        ) { result in
-            switch result {
-            case .success(let urls):
-                guard let url = urls.first else { return }
-                iconManager.setDockIcon(from: url)
-            case .failure(let error):
-                AppLogger.log(.warning, "选择 Dock 图标失败: \(error.localizedDescription)", category: "appearance")
-                break
-            }
-        }
-        .fileImporter(
-            isPresented: $showMenuBarPicker,
-            allowedContentTypes: allowedTypes,
-            allowsMultipleSelection: false
-        ) { result in
-            switch result {
-            case .success(let urls):
-                guard let url = urls.first else { return }
-                iconManager.setMenuBarIcon(from: url)
-            case .failure(let error):
-                AppLogger.log(.warning, "选择菜单栏图标失败: \(error.localizedDescription)", category: "appearance")
-                break
-            }
         }
     }
 
@@ -130,6 +100,32 @@ struct IconSettingsSection: View {
                 resetAction()
             }
             .disabled(path == nil)
+        }
+    }
+
+    private enum IconTarget {
+        case dock
+        case menuBar
+    }
+
+    private func presentOpenPanel(for target: IconTarget) {
+        AppLogger.log(.info, "打开文件选择器: \(target == .dock ? "Dock" : "MenuBar")", category: "appearance")
+        NSApp.activate(ignoringOtherApps: true)
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = allowedTypes
+        panel.allowsMultipleSelection = false
+        panel.canChooseFiles = true
+        panel.canChooseDirectories = false
+        panel.prompt = "选择"
+
+        panel.begin { response in
+            guard response == .OK, let url = panel.url else { return }
+            switch target {
+            case .dock:
+                iconManager.setDockIcon(from: url)
+            case .menuBar:
+                iconManager.setMenuBarIcon(from: url)
+            }
         }
     }
 }
