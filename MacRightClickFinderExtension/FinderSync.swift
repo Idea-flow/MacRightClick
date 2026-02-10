@@ -123,12 +123,55 @@ final class FinderSync: FIFinderSync {
 
 // MARK: - Menu Builders
 private extension FinderSync {
+    enum MenuIconLevel {
+        case primary
+        case secondary
+    }
+
+    func applyIcon(symbol: String, to item: NSMenuItem, level: MenuIconLevel = .primary) {
+        guard menuConfig.showIcons else { return }
+        guard let base = NSImage(systemSymbolName: symbol, accessibilityDescription: symbol) else { return }
+        let color: NSColor = {
+            switch level {
+            case .primary:
+                return NSColor.controlAccentColor
+            case .secondary:
+                return NSColor.secondaryLabelColor
+            }
+        }()
+        if #available(macOS 13.0, *),
+           let configured = base.withSymbolConfiguration(.init(hierarchicalColor: color)) {
+            configured.isTemplate = false
+            item.image = configured
+        } else {
+            // Fallback: template monochrome (system will tint automatically)
+            base.isTemplate = true
+            base.size = NSSize(width: 16, height: 16)
+            item.image = base
+        }
+    }
+
+    func applyAppIcon(path: String, to item: NSMenuItem) {
+        guard menuConfig.showIcons else { return }
+        guard FileManager.default.fileExists(atPath: path) else {
+            applyIcon(symbol: "app", to: item, level: .secondary)
+            return
+        }
+        let image = NSWorkspace.shared.icon(forFile: path)
+        image.size = NSSize(width: 16, height: 16)
+        // Keep original app icon colors.
+        image.isTemplate = false
+        item.image = image
+    }
+
+
     func addNewFileMenu(to menu: NSMenu) {
         guard !templates.isEmpty else {
             AppLogger.log(.warning, "未启用任何模板，菜单不显示", category: "finder")
             return
         }
         let parentItem = NSMenuItem(title: "新建文件", action: nil, keyEquivalent: "")
+        applyIcon(symbol: "doc.badge.plus", to: parentItem, level: .primary)
         let submenu = NSMenu(title: "新建文件")
         submenu.autoenablesItems = false
 
@@ -141,6 +184,7 @@ private extension FinderSync {
             item.tag = tagCounter
             templateIDsByTag[tagCounter] = template.id
             tagCounter += 1
+            applyIcon(symbol: "doc", to: item, level: .secondary)
             submenu.addItem(item)
         }
 
@@ -154,6 +198,7 @@ private extension FinderSync {
         let item = NSMenuItem(title: "复制当前路径", action: #selector(copyCurrentPath(_:)), keyEquivalent: "")
         item.target = self
         item.isEnabled = true
+        applyIcon(symbol: "doc.on.doc", to: item, level: .primary)
         menu.addItem(item)
     }
 
@@ -161,6 +206,7 @@ private extension FinderSync {
         let item = NSMenuItem(title: "复制当前目录路径", action: #selector(copyCurrentDirectoryPath(_:)), keyEquivalent: "")
         item.target = self
         item.isEnabled = true
+        applyIcon(symbol: "folder", to: item, level: .primary)
         menu.addItem(item)
     }
 
@@ -168,11 +214,13 @@ private extension FinderSync {
         let item = NSMenuItem(title: "进入终端", action: #selector(openTerminal(_:)), keyEquivalent: "")
         item.target = self
         item.isEnabled = true
+        applyIcon(symbol: "terminal", to: item, level: .primary)
         menu.addItem(item)
     }
 
     func addFavoriteFoldersMenu(to menu: NSMenu) {
         let parentItem = NSMenuItem(title: "常用目录", action: nil, keyEquivalent: "")
+        applyIcon(symbol: "folder", to: parentItem, level: .primary)
         let submenu = NSMenu(title: "常用目录")
         submenu.autoenablesItems = false
 
@@ -189,6 +237,7 @@ private extension FinderSync {
             item.tag = tagCounter
             favoriteFolderByTag[tagCounter] = folder
             tagCounter += 1
+            applyIcon(symbol: "folder", to: item, level: .secondary)
             submenu.addItem(item)
         }
 
@@ -198,6 +247,7 @@ private extension FinderSync {
 
     func addFavoriteAppsMenu(to menu: NSMenu) {
         let parentItem = NSMenuItem(title: "常用 App", action: nil, keyEquivalent: "")
+        applyIcon(symbol: "app", to: parentItem, level: .primary)
         let submenu = NSMenu(title: "常用 App")
         submenu.autoenablesItems = false
 
@@ -214,6 +264,7 @@ private extension FinderSync {
             item.tag = tagCounter
             favoriteAppByTag[tagCounter] = app
             tagCounter += 1
+            applyAppIcon(path: app.path, to: item)
             submenu.addItem(item)
         }
 
@@ -223,6 +274,7 @@ private extension FinderSync {
 
     func addMoveToMenu(to menu: NSMenu) {
         let parentItem = NSMenuItem(title: "移动到", action: nil, keyEquivalent: "")
+        applyIcon(symbol: "folder.badge.arrow.down", to: parentItem, level: .primary)
         let submenu = NSMenu(title: "移动到")
         submenu.autoenablesItems = false
 
@@ -238,6 +290,7 @@ private extension FinderSync {
             item.tag = tagCounter
             moveTargetByTag[tagCounter] = folder
             tagCounter += 1
+            applyIcon(symbol: "folder", to: item, level: .secondary)
             submenu.addItem(item)
         }
 

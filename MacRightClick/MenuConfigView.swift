@@ -17,6 +17,10 @@ struct MenuConfigView: View {
                 Toggle("复制当前路径", isOn: binding(\.items.copyPathEnabled))
                 Toggle("移动到", isOn: binding(\.items.moveToEnabled))
             }
+
+            Section("外观") {
+                Toggle("显示菜单图标", isOn: binding(\.showIcons))
+            }
         }
         .formStyle(.grouped)
         .padding()
