@@ -124,37 +124,31 @@ final class FinderSync: FIFinderSync {
 
 // MARK: - Menu Builders
 private extension FinderSync {
-    enum MenuIconLevel {
-        case primary
-        case secondary
+    /// 一级菜单图标：使用调色板渲染（双色/轻渐变），更贴近系统菜单的层级质感。
+    func applyPrimaryIcon(symbol: String, to item: NSMenuItem) {
+        guard menuConfig.showIcons else { return }
+        guard let base = NSImage(systemSymbolName: symbol, accessibilityDescription: symbol) else { return }
+        if #available(macOS 13.0, *),
+           let configured = base.withSymbolConfiguration(
+            .init(paletteColors: [NSColor.controlAccentColor, NSColor.secondaryLabelColor])
+           ) {
+            configured.isTemplate = false
+            item.image = configured
+            return
+        }
+        // 回退：模板单色，由系统菜单自动着色
+        base.isTemplate = true
+        base.size = NSSize(width: 16, height: 16)
+        item.image = base
     }
 
-    /// 设置菜单项图标（SF Symbols），并按层级色渲染以贴近系统菜单风格。
-    /// - Parameters:
-    ///   - symbol: SF Symbols 名称
-    ///   - item: 需要设置图标的菜单项
-    ///   - level: 主/次层级（影响颜色强度）
-    func applyIcon(symbol: String, to item: NSMenuItem, level: MenuIconLevel = .primary) {
-        guard menuConfig.showIcons else { return } // 用户关闭图标时不渲染
-        guard let base = NSImage(systemSymbolName: symbol, accessibilityDescription: symbol) else { return } // SF Symbol 生成失败直接跳过
-        let color: NSColor = { // 主/次层级分别使用强调色/次级色
-            switch level {
-            case .primary:
-                return NSColor.controlAccentColor
-            case .secondary:
-                return NSColor.secondaryLabelColor
-            }
-        }()
-        if #available(macOS 13.0, *),
-           let configured = base.withSymbolConfiguration(.init(hierarchicalColor: color)) {
-            configured.isTemplate = false // 层级色已渲染，避免再被系统二次着色
-            item.image = configured
-        } else {
-            // 旧系统回退：模板图标，由系统菜单自行着色
-            base.isTemplate = true
-            base.size = NSSize(width: 16, height: 16)
-            item.image = base
-        }
+    /// 二级菜单图标：保持系统模板灰阶，避免视觉干扰。
+    func applySecondaryIcon(symbol: String, to item: NSMenuItem) {
+        guard menuConfig.showIcons else { return }
+        guard let base = NSImage(systemSymbolName: symbol, accessibilityDescription: symbol) else { return }
+        base.isTemplate = true
+        base.size = NSSize(width: 16, height: 16)
+        item.image = base
     }
 
     /// 设置“常用 App”菜单图标，优先使用应用自身图标（彩色）。
@@ -162,7 +156,7 @@ private extension FinderSync {
     func applyAppIcon(path: String, to item: NSMenuItem) {
         guard menuConfig.showIcons else { return } // 用户关闭图标时不渲染
         guard FileManager.default.fileExists(atPath: path) else { // 路径无效时回退
-            applyIcon(symbol: "app", to: item, level: .secondary)
+            applySecondaryIcon(symbol: "app", to: item)
             return
         }
         let image = NSWorkspace.shared.icon(forFile: path) // 系统读取应用图标
@@ -191,7 +185,7 @@ private extension FinderSync {
             return
         }
         let parentItem = NSMenuItem(title: "新建文件", action: nil, keyEquivalent: "")
-        applyIcon(symbol: "doc.badge.plus", to: parentItem) // 主菜单图标
+        applyPrimaryIcon(symbol: "doc.badge.plus", to: parentItem) // 一级菜单图标
         let submenu = NSMenu(title: "新建文件")
         submenu.autoenablesItems = false
 
@@ -218,7 +212,7 @@ private extension FinderSync {
         let item = NSMenuItem(title: "复制当前路径", action: #selector(copyCurrentPath(_:)), keyEquivalent: "")
         item.target = self
         item.isEnabled = true
-        applyIcon(symbol: "doc.on.doc", to: item, level: .primary)
+        applyPrimaryIcon(symbol: "doc.on.doc", to: item)
         menu.addItem(item)
     }
 
@@ -226,7 +220,7 @@ private extension FinderSync {
         let item = NSMenuItem(title: "复制当前目录路径", action: #selector(copyCurrentDirectoryPath(_:)), keyEquivalent: "")
         item.target = self
         item.isEnabled = true
-        applyIcon(symbol: "folder", to: item, level: .primary)
+        applyPrimaryIcon(symbol: "folder", to: item)
         menu.addItem(item)
     }
 
@@ -234,13 +228,13 @@ private extension FinderSync {
         let item = NSMenuItem(title: "进入终端", action: #selector(openTerminal(_:)), keyEquivalent: "")
         item.target = self
         item.isEnabled = true
-        applyIcon(symbol: "terminal", to: item, level: .primary)
+        applyPrimaryIcon(symbol: "terminal", to: item)
         menu.addItem(item)
     }
 
     func addFavoriteFoldersMenu(to menu: NSMenu) {
         let parentItem = NSMenuItem(title: "常用目录", action: nil, keyEquivalent: "")
-        applyIcon(symbol: "folder", to: parentItem, level: .primary)
+        applyPrimaryIcon(symbol: "folder", to: parentItem)
         let submenu = NSMenu(title: "常用目录")
         submenu.autoenablesItems = false
 
@@ -257,7 +251,7 @@ private extension FinderSync {
             item.tag = tagCounter
             favoriteFolderByTag[tagCounter] = folder
             tagCounter += 1
-            applyIcon(symbol: "folder", to: item, level: .secondary)
+            applySecondaryIcon(symbol: "folder", to: item)
             submenu.addItem(item)
         }
 
@@ -267,7 +261,7 @@ private extension FinderSync {
 
     func addFavoriteAppsMenu(to menu: NSMenu) {
         let parentItem = NSMenuItem(title: "常用 App", action: nil, keyEquivalent: "")
-        applyIcon(symbol: "app", to: parentItem, level: .primary)
+        applyPrimaryIcon(symbol: "app", to: parentItem)
         let submenu = NSMenu(title: "常用 App")
         submenu.autoenablesItems = false
 
@@ -294,7 +288,7 @@ private extension FinderSync {
 
     func addMoveToMenu(to menu: NSMenu) {
         let parentItem = NSMenuItem(title: "移动到", action: nil, keyEquivalent: "")
-        applyIcon(symbol: "folder.badge.arrow.down", to: parentItem, level: .primary)
+        applyPrimaryIcon(symbol: "folder.badge.arrow.down", to: parentItem)
         let submenu = NSMenu(title: "移动到")
         submenu.autoenablesItems = false
 
@@ -310,7 +304,7 @@ private extension FinderSync {
             item.tag = tagCounter
             moveTargetByTag[tagCounter] = folder
             tagCounter += 1
-            applyIcon(symbol: "folder", to: item, level: .secondary)
+            applySecondaryIcon(symbol: "folder", to: item)
             submenu.addItem(item)
         }
 
