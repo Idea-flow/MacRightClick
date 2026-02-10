@@ -12,6 +12,27 @@ enum TemplateKind: String, Codable, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
+    var iconFileExtension: String {
+        switch self {
+        case .text:
+            return "txt"
+        case .markdown:
+            return "md"
+        case .pdf:
+            return "pdf"
+        case .json:
+            return "json"
+        case .docx:
+            return "docx"
+        case .xlsx:
+            return "xlsx"
+        case .pptx:
+            return "pptx"
+        case .custom:
+            return "txt"
+        }
+    }
+
     var displayName: String {
         switch self {
         case .text:

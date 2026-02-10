@@ -1,6 +1,7 @@
 import Cocoa
 import FinderSync
 import CoreGraphics
+import UniformTypeIdentifiers
 
 final class FinderSync: FIFinderSync {
     private var templates: [FileTemplate] = []
@@ -164,6 +165,17 @@ private extension FinderSync {
         item.image = image
     }
 
+    func applyFileTypeIcon(for template: FileTemplate, to item: NSMenuItem) {
+        guard menuConfig.showIcons else { return }
+        let ext = template.kind.iconFileExtension
+        if let utType = UTType(filenameExtension: ext) {
+            item.image = NSWorkspace.shared.icon(forFileType: utType.identifier)
+        } else {
+            item.image = NSWorkspace.shared.icon(forFileType: ext)
+        }
+        item.image?.size = NSSize(width: 16, height: 16)
+    }
+
 
     func addNewFileMenu(to menu: NSMenu) {
         guard !templates.isEmpty else {
@@ -171,7 +183,7 @@ private extension FinderSync {
             return
         }
         let parentItem = NSMenuItem(title: "新建文件", action: nil, keyEquivalent: "")
-        applyIcon(symbol: "doc.badge.plus", to: parentItem, level: .primary)
+        applyIcon(symbol: "doc.badge.plus", to: parentItem)
         let submenu = NSMenu(title: "新建文件")
         submenu.autoenablesItems = false
 
@@ -184,7 +196,7 @@ private extension FinderSync {
             item.tag = tagCounter
             templateIDsByTag[tagCounter] = template.id
             tagCounter += 1
-            applyIcon(symbol: "doc", to: item, level: .secondary)
+            applyFileTypeIcon(for: template, to: item)
             submenu.addItem(item)
         }
 
