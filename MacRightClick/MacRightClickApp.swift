@@ -5,6 +5,7 @@ import AppKit
 struct MacRightClickApp: App {
     @AppStorage("ShowMenuBar", store: .appGroup) private var showMenuBar = true
     @AppStorage("ShowDockIcon", store: .appGroup) private var showDockIcon = true
+    @State private var iconManager = AppIconManager.shared
 
     init() {
         _ = LogStore.shared
@@ -16,6 +17,7 @@ struct MacRightClickApp: App {
         sendAppRunning()
         DispatchQueue.main.async {
             DockVisibility.apply(showDockIcon: UserDefaults.appGroup.object(forKey: "ShowDockIcon") as? Bool ?? true)
+            AppIconManager.shared.applyStoredIcons()
         }
         AppLogger.log(.info, "App 启动", category: "app")
 
@@ -33,12 +35,16 @@ struct MacRightClickApp: App {
     var body: some Scene {
         WindowGroup("右键助手", id: "main") {
             ContentView()
+                .environment(iconManager)
         }
         Settings {
             SettingsView()
+                .environment(iconManager)
         }
-        MenuBarExtra("右键助手", image: "MenuBarIcon", isInserted: $showMenuBar) {
+        MenuBarExtra(isInserted: $showMenuBar) {
             MenuBarContentView()
+        } label: {
+            iconManager.menuBarLabel()
         }
     }
 

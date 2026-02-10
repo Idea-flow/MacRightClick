@@ -39,6 +39,8 @@ struct SettingsView: View {
                     }
             }
 
+            IconSettingsSection()
+
         }
         .formStyle(.grouped)
         .padding()
