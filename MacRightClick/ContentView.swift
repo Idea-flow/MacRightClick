@@ -20,6 +20,8 @@ struct ContentView: View {
             SidebarView(selection: $selection)
         } detail: {
             switch selection {
+            case .myWallpapers:
+                WallpaperGalleryWorkspaceView()
             case .templates:
                 TemplateWorkspaceView(store: store)
             case .menuConfig:
@@ -68,6 +70,7 @@ struct ContentView: View {
 }
 
 private enum SidebarItem: String, Hashable, CaseIterable, Identifiable {
+    case myWallpapers
     case templates
     case menuConfig
     case favoriteFolders
@@ -85,6 +88,8 @@ private struct SidebarView: View {
     var body: some View {
         List(selection: $selection) {
             Section("功能") {
+                Label("我的壁纸", systemImage: "photo.stack")
+                    .tag(SidebarItem.myWallpapers)
                 Label("授权目录", systemImage: "folder.badge.plus")
                      .tag(SidebarItem.authorizedFolders)
                 Label("文件模板", systemImage: "doc.text")
@@ -296,4 +301,226 @@ private struct AddTemplateSheet: View {
         store.addTemplate(template)
         dismiss()
     }
+}
+
+private struct WallpaperGalleryWorkspaceView: View {
+    @State private var wallpapers: [WallpaperItem] = WallpaperItem.samples
+    @State private var selectedID: WallpaperItem.ID = WallpaperItem.samples[0].id
+    @State private var showMetadata = true
+    @State private var appliedToast = false
+
+    private var selectedIndex: Int {
+        wallpapers.firstIndex(where: { $0.id == selectedID }) ?? 0
+    }
+
+    private var selected: WallpaperItem {
+        wallpapers[selectedIndex]
+    }
+
+    var body: some View {
+        VStack(spacing: 12) {
+            immersiveHero
+            filmStrip
+        }
+        .padding(16)
+        .background(
+            LinearGradient(
+                colors: [.black.opacity(0.18), .indigo.opacity(0.08), .black.opacity(0.2)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
+        .animation(.easeInOut(duration: 0.22), value: selectedID)
+    }
+
+    private var immersiveHero: some View {
+        ZStack(alignment: .bottomLeading) {
+            wallpaperCanvas(for: selected)
+                .frame(maxWidth: .infinity, minHeight: 360)
+                .clipShape(.rect(cornerRadius: 18))
+                .overlay(alignment: .topTrailing) {
+                    if appliedToast {
+                        Text("已应用到桌面")
+                            .font(.caption.bold())
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(.thinMaterial, in: Capsule())
+                            .padding(12)
+                            .transition(.move(edge: .top).combined(with: .opacity))
+                    }
+                }
+
+            LinearGradient(
+                colors: [.clear, .black.opacity(0.42)],
+                startPoint: .center,
+                endPoint: .bottom
+            )
+            .clipShape(.rect(cornerRadius: 18))
+
+            HStack(alignment: .bottom) {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(selected.title)
+                        .font(.title2.bold())
+                        .foregroundStyle(.white)
+                    if showMetadata {
+                        Text("\(selected.sizeLabel) · \(selected.tags.joined(separator: " · "))")
+                            .font(.footnote)
+                            .foregroundStyle(.white.opacity(0.88))
+                    }
+                }
+                Spacer()
+                HStack(spacing: 8) {
+                    galleryActionButton("shuffle", label: "随机", action: selectRandom)
+                    galleryActionButton(selected.isFavorite ? "heart.fill" : "heart", label: "收藏") {
+                        toggleFavorite()
+                    }
+                    galleryActionButton("display.2", label: "设为桌面", action: applyCurrentWallpaper)
+                }
+            }
+            .padding(16)
+        }
+    }
+
+    private var filmStrip: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("胶片轨道")
+                    .font(.headline)
+                Spacer()
+                Toggle("显示信息", isOn: $showMetadata)
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+            }
+            ScrollViewReader { proxy in
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        ForEach(wallpapers) { item in
+                            Button {
+                                selectedID = item.id
+                            } label: {
+                                wallpaperCanvas(for: item)
+                                    .frame(width: 164, height: 92)
+                                    .clipShape(.rect(cornerRadius: 10))
+                                    .overlay {
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .stroke(item.id == selectedID ? .white : .white.opacity(0.2), lineWidth: item.id == selectedID ? 2 : 1)
+                                    }
+                                    .overlay(alignment: .topLeading) {
+                                        if item.isFavorite {
+                                            Image(systemName: "heart.fill")
+                                                .font(.caption2)
+                                                .foregroundStyle(.white)
+                                                .padding(6)
+                                                .background(.black.opacity(0.35), in: Circle())
+                                                .padding(6)
+                                        }
+                                    }
+                            }
+                            .buttonStyle(.plain)
+                            .id(item.id)
+                        }
+                    }
+                    .padding(.vertical, 6)
+                }
+                .onChange(of: selectedID) { _, newValue in
+                    withAnimation(.easeInOut(duration: 0.22)) {
+                        proxy.scrollTo(newValue, anchor: .center)
+                    }
+                }
+            }
+        }
+        .padding(14)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
+    }
+
+    private func wallpaperCanvas(for item: WallpaperItem) -> some View {
+        ZStack {
+            LinearGradient(colors: item.colors, startPoint: .topLeading, endPoint: .bottomTrailing)
+            Circle()
+                .fill(.white.opacity(0.14))
+                .frame(width: 190, height: 190)
+                .offset(x: 90, y: -60)
+            RoundedRectangle(cornerRadius: 80)
+                .fill(.white.opacity(0.08))
+                .frame(width: 280, height: 100)
+                .rotationEffect(.degrees(-12))
+                .offset(x: -100, y: 80)
+            Image(systemName: item.symbol)
+                .font(.system(size: 76, weight: .thin))
+                .foregroundStyle(.white.opacity(0.72))
+        }
+    }
+
+    private func galleryActionButton(_ symbol: String, label: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Label(label, systemImage: symbol)
+                .font(.subheadline.weight(.semibold))
+                .padding(.horizontal, 10)
+                .padding(.vertical, 8)
+        }
+        .buttonStyle(.borderedProminent)
+        .tint(.black.opacity(0.35))
+    }
+
+    private func selectRandom() {
+        guard wallpapers.count > 1 else { return }
+        let current = selectedID
+        var next = current
+        while next == current {
+            next = wallpapers.randomElement()?.id ?? current
+        }
+        selectedID = next
+    }
+
+    private func toggleFavorite() {
+        guard let index = wallpapers.firstIndex(where: { $0.id == selectedID }) else { return }
+        wallpapers[index].isFavorite.toggle()
+    }
+
+    private func applyCurrentWallpaper() {
+        withAnimation(.easeInOut(duration: 0.2)) {
+            appliedToast = true
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                appliedToast = false
+            }
+        }
+    }
+}
+
+private struct WallpaperItem: Identifiable, Hashable {
+    let id: UUID
+    var title: String
+    var tags: [String]
+    var sizeLabel: String
+    var symbol: String
+    var colors: [Color]
+    var isFavorite: Bool
+
+    init(
+        id: UUID = UUID(),
+        title: String,
+        tags: [String],
+        sizeLabel: String,
+        symbol: String,
+        colors: [Color],
+        isFavorite: Bool = false
+    ) {
+        self.id = id
+        self.title = title
+        self.tags = tags
+        self.sizeLabel = sizeLabel
+        self.symbol = symbol
+        self.colors = colors
+        self.isFavorite = isFavorite
+    }
+
+    static let samples: [WallpaperItem] = [
+        WallpaperItem(title: "极光海岸", tags: ["风景", "冷色"], sizeLabel: "6K", symbol: "mountain.2", colors: [.blue, .cyan, .mint]),
+        WallpaperItem(title: "霓虹都市", tags: ["赛博", "夜景"], sizeLabel: "5K", symbol: "building.2.crop.circle", colors: [.pink, .purple, .indigo]),
+        WallpaperItem(title: "赤道日落", tags: ["日落", "暖色"], sizeLabel: "4K", symbol: "sun.max", colors: [.orange, .red, .pink]),
+        WallpaperItem(title: "森林薄雾", tags: ["自然", "静谧"], sizeLabel: "4K", symbol: "leaf", colors: [.green, .mint, .teal]),
+        WallpaperItem(title: "深空轨道", tags: ["太空", "暗色"], sizeLabel: "8K", symbol: "sparkles", colors: [.black, .indigo, .blue])
+    ]
 }

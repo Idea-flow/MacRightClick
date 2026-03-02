@@ -3,6 +3,7 @@ import AppKit
 
 @main
 struct MacRightClickApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @AppStorage("ShowMenuBar", store: .appGroup) private var showMenuBar = true
     @AppStorage("ShowDockIcon", store: .appGroup) private var showDockIcon = true
     @State private var iconManager = AppIconManager.shared
@@ -33,9 +34,10 @@ struct MacRightClickApp: App {
     }
 
     var body: some Scene {
-        WindowGroup("右键助手", id: "main") {
+        Window("右键助手", id: "main") {
             ContentView()
                 .environment(iconManager)
+                .background(MainWindowCloseGuard())
         }
         Settings {
             SettingsView()
@@ -405,17 +407,82 @@ struct MacRightClickApp: App {
     }
 }
 
+private final class AppDelegate: NSObject, NSApplicationDelegate {
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+        // Keep app alive in menu bar / Finder extension mode when the main window closes.
+        false
+    }
+}
+
 private struct MenuBarContentView: View {
     @Environment(\.openWindow) private var openWindow
 
     var body: some View {
         Button("打开主程序") {
-            openWindow(id: "main")
-            NSApp.activate(ignoringOtherApps: true)
+            openOrActivateMainWindow()
         }
         Divider()
         Button("退出") {
             NSApp.terminate(nil)
+        }
+    }
+
+    private func openOrActivateMainWindow() {
+        // Prefer reusing the existing main window to avoid duplicates.
+        if let existingWindow = NSApp.windows.first(where: { $0.title == "右键助手" }) {
+            if existingWindow.isMiniaturized {
+                existingWindow.deminiaturize(nil)
+            }
+            existingWindow.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+            return
+        }
+
+        openWindow(id: "main")
+        DispatchQueue.main.async {
+            NSApp.activate(ignoringOtherApps: true)
+        }
+    }
+}
+
+private struct MainWindowCloseGuard: NSViewRepresentable {
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView()
+        DispatchQueue.main.async {
+            guard let window = view.window else { return }
+            window.delegate = MainWindowCloseDelegate.shared
+        }
+        return view
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {
+        DispatchQueue.main.async {
+            guard let window = nsView.window else { return }
+            window.delegate = MainWindowCloseDelegate.shared
+        }
+    }
+}
+
+private final class MainWindowCloseDelegate: NSObject, NSWindowDelegate {
+    static let shared = MainWindowCloseDelegate()
+
+    func windowShouldClose(_ sender: NSWindow) -> Bool {
+        let alert = NSAlert()
+        alert.messageText = "关闭主窗口"
+        alert.informativeText = "关闭窗口后，菜单栏与 Finder 右键功能仍会继续运行。"
+        alert.addButton(withTitle: "仅关闭窗口")
+        alert.addButton(withTitle: "退出应用")
+        alert.addButton(withTitle: "取消")
+
+        let response = alert.runModal()
+        switch response {
+        case .alertFirstButtonReturn:
+            return true
+        case .alertSecondButtonReturn:
+            NSApp.terminate(nil)
+            return false
+        default:
+            return false
         }
     }
 }
