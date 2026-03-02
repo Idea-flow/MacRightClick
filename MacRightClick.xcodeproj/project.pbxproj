@@ -58,7 +58,7 @@
 		17D6917E3A2E18DFBBBA6699 /* FavoriteFoldersView.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; name = FavoriteFoldersView.swift; path = MacRightClick/FavoriteFoldersView.swift; sourceTree = SOURCE_ROOT; };
 		20348A321C54F96DAFEAAFF0 /* 右键菜单规划与实现方案.md */ = {isa = PBXFileReference; explicitFileType = net.daringfireball.markdown; name = "右键菜单规划与实现方案.md"; path = "AI/plan/右键菜单规划与实现方案.md"; sourceTree = SOURCE_ROOT; };
 		233F8EC4446307D237AB97DA /* ContentView.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; name = ContentView.swift; path = MacRightClick/ContentView.swift; sourceTree = SOURCE_ROOT; };
-		358317F04C1CC1D419943AEE /* todo.md */ = {isa = PBXFileReference; explicitFileType = net.daringfireball.markdown; lastKnownFileType = net.daringfireball.markdown; name = todo.md; path = AI/todo.md; sourceTree = SOURCE_ROOT; };
+		358317F04C1CC1D419943AEE /* todo.md */ = {isa = PBXFileReference; explicitFileType = net.daringfireball.markdown; name = todo.md; path = AI/todo.md; sourceTree = SOURCE_ROOT; };
 		40EBB6B04760A7D035E68D1B /* MenuConfigView.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; name = MenuConfigView.swift; path = MacRightClick/MenuConfigView.swift; sourceTree = SOURCE_ROOT; };
 		43C3DFCBD13191D21BD1FCB1 /* TemplateStore.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; name = TemplateStore.swift; path = Shared/TemplateStore.swift; sourceTree = SOURCE_ROOT; };
 		57A55DF92F39C4EF005A6194 /* MacRightClick.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MacRightClick.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -501,7 +501,7 @@
 				CODE_SIGN_ENTITLEMENTS = MacRightClick/MacRightClick.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 1.0.1;
 				DEVELOPMENT_TEAM = 2VU69Q9CGK;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -513,7 +513,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.biliww.MacRightClick;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -534,7 +534,7 @@
 				CODE_SIGN_ENTITLEMENTS = MacRightClick/MacRightClick.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 1.0.1;
 				DEVELOPMENT_TEAM = 2VU69Q9CGK;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -546,7 +546,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.biliww.MacRightClick;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
